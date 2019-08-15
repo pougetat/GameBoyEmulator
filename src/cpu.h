@@ -10,8 +10,9 @@ struct Cpu {
     uint16_t flag; // flag register
 };
 
-struct Cpu init_cpu();
+struct Cpu * init_cpu();
 
 void execute_instruction(uint8_t * mmap, struct Cpu * cpu);
+void debug_cpu(uint8_t * mmap, struct Cpu * cpu);
 
 #endif
