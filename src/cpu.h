@@ -10,6 +10,8 @@ struct Cpu {
     uint16_t flag; // flag register
 };
 
+enum registers{B,C,D,E,H,L,A};
+
 struct Cpu * init_cpu();
 
 void execute_instruction(uint8_t * mmap, struct Cpu * cpu);

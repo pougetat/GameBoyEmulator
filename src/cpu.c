@@ -4,6 +4,7 @@
 #include "cpu.h"
 #include "cpu_instructions/ld_immediate_8bit.h"
 #include "cpu_instructions/ld_immediate_16bit.h"
+#include "cpu_instructions/alu.h"
 
 struct Cpu * init_cpu() {
     struct Cpu * cpu = malloc(sizeof(struct Cpu));
@@ -41,6 +42,10 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
         {
             ld_immediate_8bit(p, cpu, mmap);
         }
+    }
+    else if (x == 2)
+    {
+        alu_reg_operand(y, z, cpu);
     }
 }
 
