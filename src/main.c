@@ -1,5 +1,7 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include "mmap.h"
+#include "cpu.h"
 
 int main(void)
 {
