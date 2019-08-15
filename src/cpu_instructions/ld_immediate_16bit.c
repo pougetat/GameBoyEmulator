@@ -21,6 +21,6 @@ void ld_immediate_16bit(int reg, struct Cpu * cpu, uint8_t * mmap)
     else
     {
         cpu->registers[2*reg] = value >> 8;
-        cpu->registers[2*reg+1] = value && 0xFF;    
+        cpu->registers[2*reg+1] = value & 0xFF;    
     }
 }
