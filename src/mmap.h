@@ -1,5 +1,4 @@
 #include <stdio.h>
+#include <stdint.h>
 
-int * mmap;
-
-void init_memory_map(FILE * rom_file);
+uint8_t * init_memory_map(FILE * rom_file);

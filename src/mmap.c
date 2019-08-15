@@ -6,7 +6,7 @@
 #define MMAP_SIZE 65536 // 0x0000 - 0xFFFF
 #define MAX_ROM_SIZE 16384 // 0x0000 - 0x3FFF (only handling 32 KB roms for now)
 
-void init_memory_map(FILE * rom_file)
+uint8_t * init_memory_map(FILE * rom_file)
 {    
     uint8_t * mmap = malloc(MMAP_SIZE);
 
@@ -17,4 +17,6 @@ void init_memory_map(FILE * rom_file)
         mmap[cur_pos++] = (uint8_t) byte;
     }
     fclose(rom_file);
+
+    return mmap;
 }
