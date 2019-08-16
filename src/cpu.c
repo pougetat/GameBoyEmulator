@@ -9,7 +9,7 @@
 struct Cpu * init_cpu() {
     struct Cpu * cpu = malloc(sizeof(struct Cpu));
 
-    for (int i = 0; i < 7; i++)\
+    for (int i = 0; i < 7; i++)
     {
         cpu->registers[i] = 0;
     }
