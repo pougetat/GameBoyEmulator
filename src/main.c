@@ -23,7 +23,8 @@ int main(void)
     execute_instruction(mmap, cpu);
     execute_instruction(mmap, cpu);
     execute_instruction(mmap, cpu);
-
+    execute_instruction(mmap, cpu);
+    execute_instruction(mmap, cpu);
 
     return 0;
 }

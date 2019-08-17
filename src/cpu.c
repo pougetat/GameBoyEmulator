@@ -27,8 +27,6 @@ struct Cpu * init_cpu() {
 */
 void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
 {
-    debug_cpu(mmap, cpu);
-
     uint8_t opcode = mmap[cpu->regPC++];
 
     switch (opcode)
@@ -86,6 +84,10 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
             LD_r_n(cpu->regE, cpu, mmap);
             cpu->regPC++;
             break;
+        case 0x20:
+            JR_NZ_sn(cpu, mmap);
+            cpu->regPC++;
+            break;
         case 0x26:
             LD_r_n(cpu->regH, cpu, mmap);
             cpu->regPC++;
@@ -112,25 +114,25 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
                     BIT(0, get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
                     break;
                 case 0x48 ... 0x4D:
-                    BIT(1, get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
+                    BIT(1, get_reg_by_num(cpu, opcode & 0b111), cpu->FLAG);
                     break;
                 case 0x50 ... 0x55:
                     BIT(2, get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
                     break;
                 case 0x58 ... 0x5D:
-                    BIT(3, get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
+                    BIT(3, get_reg_by_num(cpu, opcode & 0b111), cpu->FLAG);
                     break;
                 case 0x60 ... 0x65:
                     BIT(4, get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
                     break;
                 case 0x68 ... 0x6D:
-                    BIT(5, get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
+                    BIT(5, get_reg_by_num(cpu, opcode & 0b111), cpu->FLAG);
                     break;
                 case 0x70 ... 0x75:
                     BIT(6, get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
                     break;
                 case 0x78 ... 0x7D:
-                    BIT(7, get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
+                    BIT(7, get_reg_by_num(cpu, opcode & 0b111), cpu->FLAG);
                     break;
                 default:
                     break;
@@ -139,6 +141,8 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
         default:
             break;
     }
+
+    debug_cpu(mmap, cpu);
 }
 
 uint8_t get_reg_by_num(struct Cpu * cpu, uint8_t reg_num)
@@ -184,10 +188,11 @@ void debug_cpu(uint8_t * mmap, struct Cpu * cpu)
     printf("    reg H = 0x%x \n", cpu->regH);
     printf("    reg L = 0x%x \n", cpu->regL);
     printf("    reg A = 0x%x \n", cpu->regA);
+    printf("    reg FLAG = 0x%x \n", cpu->FLAG);
     printf("    sp = 0x%x \n", cpu->regSP);
     printf("    pc = 0x%x \n", cpu->regPC);
     // current instruction opcode
-    printf("    current instruction : 0x%x \n", mmap[cpu->regPC]);
+    printf("    pc instruction: 0x%x \n", mmap[cpu->regPC]);
 
     printf("\n");
 }

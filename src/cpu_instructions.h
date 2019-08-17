@@ -63,14 +63,37 @@
         DEC_r(reg_low) \
     }
 
+// decrement register
 #define DEC_r(reg) \
     reg--;
 
+#define JR_NZ_sn(cpu_ptr, mmap_ptr) \
+    if (TEST_BIT_IS_0(7, cpu->FLAG)) \
+    { \
+        cpu->regPC += FETCH_SIGNED_8BIT_VAL(mmap_ptr, cpu->regPC); \
+    } \
+    else \
+    { \
+        cpu->regPC++; \
+    }
+
+// xor
 #define XOR_A(regA, reg) \
     regA = regA ^ reg;
 
+// sets the zero flag (bit 7 of reg FLAG) to value of TEST_BIT_IS_0
 #define BIT(bit_num, reg, flag_reg) \
-    flag_reg |= TEST_BIT(bit_num, reg) << 7
+    if (TEST_BIT_IS_0(bit_num, reg)) \
+    { \
+        flag_reg |= 1 << 7; \
+        \
+    } \
+    else \
+    { \
+        flag_reg = flag_reg << 1 >> 1; \
+    }
 
-#define TEST_BIT(bit_num, reg) \
-    ((reg & (0x1 << bit_num)) >> bit_num)
+#define TEST_NZ(bit_num, reg) \
+
+#define TEST_BIT_IS_0(bit_num, reg) \
+    ((reg >> bit_num) ^ 0x1)

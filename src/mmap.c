@@ -18,7 +18,7 @@ uint8_t * init_memory_map(FILE * rom_file)
     fclose(rom_file);
 
     for (int i = 0; i < 256; i++) {
-        printf("%x ", mmap[i]);
+        printf("%i : %x \n", i, mmap[i]);
     }
     printf("\n");
 
