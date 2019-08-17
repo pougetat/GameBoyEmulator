@@ -54,6 +54,9 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
             LD_r_n(cpu->regB, cpu, mmap);
             cpu->regPC++;
             break;
+        case 0x0c:
+            INC_r(cpu->regC);
+            break;
         case 0x11:
             LD_rr_nn(cpu->regD, cpu->regE, cpu, mmap);
             cpu->regPC = cpu->regPC + 2;
@@ -65,6 +68,9 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
         case 0x16:
             LD_r_n(cpu->regD, cpu, mmap);
             cpu->regPC++;
+            break;
+        case 0x1A:
+            LD_r_addr(cpu->regA, mmap, REG_PAIR_VAL(cpu->regD, cpu->regE));
             break;
         case 0x1E:
             LD_r_n(cpu->regE, cpu, mmap);
@@ -100,6 +106,12 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
             LD_r_n(cpu->regA, cpu, mmap);
             cpu->regPC++;
             break;
+        case 0x4F: // ld c a
+            LD_r_r(cpu->regC, cpu->regA);
+            break;
+        case 0x77:
+            LD_addr_r(mmap, REG_PAIR_VAL(cpu->regH, cpu->regL), cpu->regA);
+            break;
         case 0xA8 ... 0xAD: 
             XOR_A(cpu->regA, get_reg_by_num(cpu, opcode & 0xF));
             break;
@@ -108,6 +120,16 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
             break;
         case 0xAF:
             XOR_A(cpu->regA, cpu->regA);
+            break;
+        case 0xCD:
+            CALL_nn(mmap, cpu->regSP, cpu);
+            break;
+        case 0xE0:
+            LD_addr_r(mmap, 0xFF00 + FETCH_8BIT_VAL(mmap, cpu->regPC), cpu->regA);
+            cpu->regPC++;
+            break;
+        case 0xE2:
+            LD_addr_r(mmap, 0xFF00 + cpu->regC, cpu->regA);
             break;
         case 0xF2:
             LD_r_addr(cpu->regA, mmap, 0xFF00 + cpu->regC);
@@ -144,8 +166,10 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
                 default:
                     break;
             }
+            break;
 
         default:
+            printf("%i", 0/0);
             break;
     }
 

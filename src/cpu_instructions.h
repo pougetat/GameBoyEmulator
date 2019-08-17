@@ -9,7 +9,7 @@
     reg = FETCH_8BIT_VAL(mmap_ptr, cpu_ptr->regPC); \
 
 // register_dest <- register_src
-#define LD_r_r(reg_dest, reg_src, cpu_ptr) \
+#define LD_r_r(reg_dest, reg_src) \
     reg_dest = reg_src; \
 
 // register pair <- immediate nn
@@ -93,7 +93,9 @@
         flag_reg = flag_reg << 1 >> 1; \
     }
 
-#define TEST_NZ(bit_num, reg) \
-
 #define TEST_BIT_IS_0(bit_num, reg) \
     ((reg >> bit_num) ^ 0x1)
+
+#define CALL_nn(mmap_ptr, reg_sp, cpu_ptr) \
+    STORE_16BIT_VAL(mmap_ptr, reg_sp-1, cpu_ptr->regPC); \
+    cpu->regPC = FETCH_16BIT_VAL(mmap_ptr, cpu_ptr->regPC);
