@@ -16,6 +16,9 @@ struct Cpu {
     uint16_t FLAG;
 };
 
+#define REG_PAIR_VAL(reg_high, reg_low) \
+    (((uint16_t) reg_high << 8) | reg_low)
+
 struct Cpu * init_cpu();
 
 void execute_instruction(uint8_t * mmap, struct Cpu * cpu);
