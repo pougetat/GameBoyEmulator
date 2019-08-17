@@ -25,6 +25,10 @@
 #define LD_addr_r(mmap_ptr, address, reg) \
     STORE_8BIT_VAL(mmap_ptr, address, reg)
 
+// register <- (address)
+#define LD_r_addr(reg, mmap_ptr, address) \
+    reg = mmap_ptr[address]
+
 // (address) <- register; increment register pair
 #define LDI_addr_r(mmap_ptr, reg_high, reg_low, src_reg) \
     LD_addr_r(mmap_ptr, REG_PAIR_VAL(reg_high, reg_low), src_reg) \
@@ -71,10 +75,6 @@
     if (TEST_BIT_IS_0(7, cpu->FLAG)) \
     { \
         cpu->regPC += FETCH_SIGNED_8BIT_VAL(mmap_ptr, cpu->regPC); \
-    } \
-    else \
-    { \
-        cpu->regPC++; \
     }
 
 // xor

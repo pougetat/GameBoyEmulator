@@ -62,20 +62,6 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
             LD_r_n(cpu->regC, cpu, mmap);
             cpu->regPC++;
             break;
-        case 0x21:
-            LD_rr_nn(cpu->regH, cpu->regL, cpu, mmap);
-            cpu->regPC = cpu->regPC + 2;
-            break;
-        case 0x22:
-            LDI_addr_r(mmap, cpu->regH, cpu->regL, cpu->regA);
-            break;
-        case 0x31:
-            LD_SP_nn(cpu, mmap);
-            cpu->regPC = cpu->regPC + 2;
-            break;
-        case 0x32:
-            LDD_addr_r(mmap, cpu->regH, cpu->regL, cpu->regA);
-            break;
         case 0x16:
             LD_r_n(cpu->regD, cpu, mmap);
             cpu->regPC++;
@@ -88,12 +74,30 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
             JR_NZ_sn(cpu, mmap);
             cpu->regPC++;
             break;
+        case 0x21:
+            LD_rr_nn(cpu->regH, cpu->regL, cpu, mmap);
+            cpu->regPC = cpu->regPC + 2;
+            break;
+        case 0x22:
+            LDI_addr_r(mmap, cpu->regH, cpu->regL, cpu->regA);
+            break;
         case 0x26:
             LD_r_n(cpu->regH, cpu, mmap);
             cpu->regPC++;
             break;
         case 0x2E:
             LD_r_n(cpu->regL, cpu, mmap);
+            cpu->regPC++;
+            break;
+        case 0x31:
+            LD_SP_nn(cpu, mmap);
+            cpu->regPC = cpu->regPC + 2;
+            break;
+        case 0x32:
+            LDD_addr_r(mmap, cpu->regH, cpu->regL, cpu->regA);
+            break;
+        case 0x3E:
+            LD_r_n(cpu->regA, cpu, mmap);
             cpu->regPC++;
             break;
         case 0xA8 ... 0xAD: 
@@ -104,6 +108,9 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
             break;
         case 0xAF:
             XOR_A(cpu->regA, cpu->regA);
+            break;
+        case 0xF2:
+            LD_r_addr(cpu->regA, mmap, 0xFF00 + cpu->regC);
             break;
         case 0xCB:
             opcode = mmap[cpu->regPC++];

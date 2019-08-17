@@ -11,13 +11,12 @@ int main(void)
     uint8_t * mmap = init_memory_map(rom_file);
     struct Cpu * cpu = init_cpu();
 
-/*
-    while(true)
+    while (REG_PAIR_VAL(cpu->regH, cpu->regL) != 0x8000)
     {
         execute_instruction(mmap, cpu);
     }
-*/
-
+    execute_instruction(mmap, cpu);
+    execute_instruction(mmap, cpu);
     execute_instruction(mmap, cpu);
     execute_instruction(mmap, cpu);
     execute_instruction(mmap, cpu);
