@@ -29,8 +29,7 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
 {
     debug_cpu(mmap, cpu);
 
-    uint8_t opcode = mmap[cpu->regPC];
-    cpu->regPC++;
+    uint8_t opcode = mmap[cpu->regPC++];
 
     switch (opcode)
     {
@@ -95,31 +94,82 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
             LD_r_n(cpu->regL, cpu, mmap);
             cpu->regPC++;
             break;
-        case 0xA8:
-            XOR_A(cpu->regA, cpu->regB);
+        case 0xA8 ... 0xAD: 
+            XOR_A(cpu->regA, get_reg_by_num(cpu, opcode & 0xF));
             break;
-        case 0xA9:
-            XOR_A(cpu->regA, cpu->regC);
-            break;
-        case 0xAA:
-            XOR_A(cpu->regA, cpu->regD);
-            break;
-        case 0xAB:
-            XOR_A(cpu->regA, cpu->regE);
-            break;
-        case 0xAC:
-            XOR_A(cpu->regA, cpu->regH);
-            break;
-        case 0xAD:
-            XOR_A(cpu->regA, cpu->regL);
         case 0xAE:
             XOR_A(cpu->regA, REG_PAIR_VAL(cpu->regH, cpu->regL));
             break;
         case 0xAF:
             XOR_A(cpu->regA, cpu->regA);
             break;
+        case 0xCB:
+            opcode = mmap[cpu->regPC++];
+
+            switch(opcode)
+            {
+                case 0x40 ... 0x45:
+                    BIT(0, get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
+                    break;
+                case 0x48 ... 0x4D:
+                    BIT(1, get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
+                    break;
+                case 0x50 ... 0x55:
+                    BIT(2, get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
+                    break;
+                case 0x58 ... 0x5D:
+                    BIT(3, get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
+                    break;
+                case 0x60 ... 0x65:
+                    BIT(4, get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
+                    break;
+                case 0x68 ... 0x6D:
+                    BIT(5, get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
+                    break;
+                case 0x70 ... 0x75:
+                    BIT(6, get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
+                    break;
+                case 0x78 ... 0x7D:
+                    BIT(7, get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
+                    break;
+                default:
+                    break;
+            }
+
         default:
             break;
+    }
+}
+
+uint8_t get_reg_by_num(struct Cpu * cpu, uint8_t reg_num)
+{
+    if (reg_num == 0)
+    {
+        return cpu->regB;
+    }
+    else if (reg_num == 1)
+    {
+        return cpu->regC;
+    }
+    else if (reg_num == 2)
+    {
+        return cpu->regD;
+    }
+    else if (reg_num == 3)
+    {
+        return cpu->regE;
+    }
+    else if (reg_num == 4)
+    {
+        return cpu->regH;
+    }
+    else if (reg_num == 5)
+    {
+        return cpu->regL;
+    }
+    else if (reg_num == 6)
+    {
+        return cpu->regA;
     }
 }
 

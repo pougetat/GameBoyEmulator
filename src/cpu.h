@@ -22,6 +22,7 @@ struct Cpu {
 struct Cpu * init_cpu();
 
 void execute_instruction(uint8_t * mmap, struct Cpu * cpu);
+uint8_t get_reg_by_num(struct Cpu * cpu, uint8_t reg_num);
 void debug_cpu(uint8_t * mmap, struct Cpu * cpu);
 
 #endif

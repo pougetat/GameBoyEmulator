@@ -68,3 +68,9 @@
 
 #define XOR_A(regA, reg) \
     regA = regA ^ reg;
+
+#define BIT(bit_num, reg, flag_reg) \
+    flag_reg |= TEST_BIT(bit_num, reg) << 7
+
+#define TEST_BIT(bit_num, reg) \
+    ((reg & (0x1 << bit_num)) >> bit_num)
