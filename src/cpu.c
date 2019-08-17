@@ -121,6 +121,9 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
         case 0xAF:
             XOR_A(cpu->regA, cpu->regA);
             break;
+        case 0xC5:
+            PUSH_rr(cpu->regB, cpu->regC, mmap, cpu->regSP);
+            break;
         case 0xCD:
             CALL_nn(mmap, cpu->regSP, cpu);
             break;
@@ -164,6 +167,7 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
                     BIT(7, get_reg_by_num(cpu, opcode & 0b111), cpu->FLAG);
                     break;
                 default:
+                    printf("%i", 0/0);
                     break;
             }
             break;
