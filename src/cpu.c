@@ -7,12 +7,14 @@
 struct Cpu * init_cpu() {
     struct Cpu * cpu = malloc(sizeof(struct Cpu));
 
-    for (int i = 0; i < 7; i++)
-    {
-        cpu->registers[i] = 0;
-    }
-    cpu->sp = 0;
-    cpu->pc = 0;
+    cpu->regB = 0;
+    cpu->regC = 0;
+    cpu->regD = 0;
+    cpu->regE = 0;
+    cpu->regH = 0;
+    cpu->regL = 0;
+    cpu->regSP = 0;
+    cpu->regPC = 0;
 
     return cpu;
 }
@@ -27,31 +29,21 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
 {
     debug_cpu(mmap, cpu);
 
-    uint8_t hex_instr = mmap[cpu->pc];
+    uint8_t opcode = mmap[cpu->regPC];
+    cpu->regPC++;
 
-    int x = hex_instr >> 6 & 0b11;
-    int y = hex_instr >> 3 & 0b111;
-    int z = hex_instr & 0b111;
-
-    int p = hex_instr >> 4 & 0b11;
-    int q = hex_instr >> 3 & 0b1;
-
-    cpu->pc++;
-
-    if (x == 0)
+    switch (opcode)
     {
-        if (z == 1)
-        {
-            LD_r_nn(p, cpu, mmap);
-        }
-        else if (z == 6)
-        {
-            LD_r_n(p, cpu, mmap);
-        }
-    }
-    else if (x == 2)
-    {
-        ALU_r(y, z, cpu);
+        case 0x01: LD_r_nn(cpu->regB, cpu->regC, cpu, mmap); break;
+        case 0x11: LD_r_nn(cpu->regD, cpu->regE, cpu, mmap); break;
+        case 0x21: LD_r_nn(cpu->regH, cpu->regL, cpu, mmap); break;
+        case 0x31: LD_SP_nn(cpu, mmap); break;
+        case 0x06: LD_r_n(cpu->regB, cpu, mmap); break;
+        case 0x0E: LD_r_n(cpu->regC, cpu, mmap); break;
+        case 0x16: LD_r_n(cpu->regD, cpu, mmap); break;
+        case 0x1E: LD_r_n(cpu->regE, cpu, mmap); break;
+        case 0x26: LD_r_n(cpu->regH, cpu, mmap); break;
+        case 0x2E: LD_r_n(cpu->regL, cpu, mmap); break;
     }
 }
 
@@ -59,17 +51,17 @@ void debug_cpu(uint8_t * mmap, struct Cpu * cpu)
 {
     printf("CPU state : \n \n");
     // register values
-    printf("    reg B = 0x%x \n", cpu->registers[0]);
-    printf("    reg C = 0x%x \n", cpu->registers[1]);
-    printf("    reg D = 0x%x \n", cpu->registers[2]);
-    printf("    reg E = 0x%x \n", cpu->registers[3]);
-    printf("    reg H = 0x%x \n", cpu->registers[4]);
-    printf("    reg L = 0x%x \n", cpu->registers[5]);
-    printf("    reg A = 0x%x \n", cpu->registers[6]);
-    printf("    sp = 0x%x \n", cpu->sp);
-    printf("    pc = 0x%x \n", cpu->pc);
+    printf("    reg B = 0x%x \n", cpu->regB);
+    printf("    reg C = 0x%x \n", cpu->regC);
+    printf("    reg D = 0x%x \n", cpu->regD);
+    printf("    reg E = 0x%x \n", cpu->regE);
+    printf("    reg H = 0x%x \n", cpu->regH);
+    printf("    reg L = 0x%x \n", cpu->regL);
+    printf("    reg A = 0x%x \n", cpu->regA);
+    printf("    sp = 0x%x \n", cpu->regSP);
+    printf("    pc = 0x%x \n", cpu->regPC);
     // current instruction opcode
-    printf("    current instruction : 0x%x \n", mmap[cpu->pc]);
+    printf("    current instruction : 0x%x \n", mmap[cpu->regPC]);
 
     printf("\n");
 }

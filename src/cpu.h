@@ -4,13 +4,17 @@
 #include <stdint.h>
 
 struct Cpu {
-    uint8_t registers[7]; // B, C, D, E, H, L, A
-    uint16_t sp; // stack pointer
-    uint16_t pc; // program counter
-    uint16_t flag; // flag register
+    uint8_t regB;
+    uint8_t regC;
+    uint8_t regD;
+    uint8_t regE;
+    uint8_t regH;
+    uint8_t regL;
+    uint8_t regA;
+    uint16_t regSP;
+    uint16_t regPC;
+    uint16_t FLAG;
 };
-
-enum registers{B,C,D,E,H,L,A};
 
 struct Cpu * init_cpu();
 

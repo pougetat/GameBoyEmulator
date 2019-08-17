@@ -1,21 +1,18 @@
 #include "mmap.h"
 #include "cpu.h"
 
-#define NOP ;
-#define EX_AF_AF ;
-#define DJNZ_d() ;
-#define JR_d() ;
-#define JR_cc_d();
-
 #define LD_r_n(reg, cpu_ptr, mmap_ptr) \
-    cpu_ptr->registers[reg] = FETCH_8BIT_VAL(mmap_ptr, cpu_ptr->pc); \
-    cpu_ptr->pc++;
+    reg = FETCH_8BIT_VAL(mmap_ptr, cpu_ptr->regPC); \
+    cpu_ptr->regPC++;
 
-#define LD_r_nn(reg, cpu_ptr, mmap_ptr) \
-    uint16_t value = FETCH_16BIT_VAL(mmap_ptr, cpu_ptr->pc); \
-    cpu_ptr->pc = cpu_ptr->pc + 2; \
-    if (reg == 3) { cpu_ptr->sp = value; } \
-    else { cpu->registers[2*reg] = value >> 8; cpu->registers[2*reg+1] = value & 0xFF; }
+#define LD_r_nn(reg_high, reg_low, cpu_ptr, mmap_ptr) \
+    reg_high = FETCH_16BIT_VAL(mmap_ptr, cpu_ptr->regPC) >> 8; \
+    reg_low = FETCH_16BIT_VAL(mmap_ptr, cpu_ptr->regPC) & 0xFF; \
+    cpu_ptr->regPC = cpu_ptr->regPC + 2;
+
+#define LD_SP_nn(cpu_ptr, mmap_ptr) \
+    cpu_ptr->regSP = FETCH_16BIT_VAL(mmap_ptr, cpu_ptr->regPC); \
+    cpu_ptr->regPC = cpu_ptr->regPC + 2;
 
 #define ALU_r(operation, reg, cpu_ptr) \
     switch(operation) { \
@@ -27,4 +24,4 @@
     }
 
 #define XOR_A(reg, cpu_ptr) \
-        cpu_ptr->registers[A] = cpu_ptr->registers[A] ^ cpu_ptr->registers[reg]; 
+        cpu_ptr->regA = cpu_ptr->regA ^ reg;
