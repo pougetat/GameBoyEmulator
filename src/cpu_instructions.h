@@ -104,10 +104,12 @@
     ((reg >> bit_num) ^ 0x1)
 
 #define CALL_nn(mmap_ptr, reg_sp, cpu_ptr) \
-    STORE_16BIT_VAL(mmap_ptr, reg_sp-1, cpu_ptr->regPC); \
-    reg_sp = reg_sp - 2; \
+    DEC_r(reg_sp); \
+    STORE_16BIT_VAL(mmap_ptr, reg_sp, cpu_ptr->regPC); \
+    DEC_r(reg_sp); \
     cpu->regPC = FETCH_16BIT_VAL(mmap_ptr, cpu_ptr->regPC);
 
 #define PUSH_rr(reg_high, reg_low, mmap_ptr, reg_sp) \
-    STORE_16BIT_VAL(mmap_ptr, reg_sp-1, REG_PAIR_VAL(reg_high, reg_low)); \
-    reg_sp = reg_sp - 2;
+    DEC_r(reg_sp); \
+    STORE_16BIT_VAL(mmap_ptr, reg_sp, REG_PAIR_VAL(reg_high, reg_low)); \
+    DEC_r(reg_sp);
