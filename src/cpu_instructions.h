@@ -52,8 +52,17 @@
     }
 
 // increment register
-#define INC_r(reg) \
-    reg++;
+#define INC_r(reg, cpu_ptr) \
+    if (CARRY) \
+    { \
+        SET_H_FLAG(cpu_ptr, 1); \
+    } \
+    reg++; \
+    if (reg == 0) \
+    { \
+        SET_Z_FLAG(cpu_ptr, 1); \
+    } \
+    SET_N_FLAG(cpu_ptr, 0);
 
 // decrement register pair
 #define DEC_rr(reg_high, reg_low) \
@@ -98,7 +107,7 @@
 #define BIT(bit_num, reg, cpu_ptr) \
     SET_Z_FLAG(cpu_ptr, TEST_BIT_IS_0(reg, bit_num)); \
     SET_N_FLAG(cpu_ptr, 0); \
-    SET_H_FLAG(cpu_ptr, 1); \
+    SET_H_FLAG(cpu_ptr, 1);
 
 #define TEST_BIT_IS_0(reg, bit_num) \
     ((reg >> bit_num) ^ 0x1)
@@ -108,6 +117,11 @@
     STORE_16BIT_VAL(mmap_ptr, reg_sp, cpu_ptr->regPC); \
     DEC_r(reg_sp); \
     cpu->regPC = FETCH_16BIT_VAL(mmap_ptr, cpu_ptr->regPC);
+
+#define RET(mmap_ptr, cpu_ptr) \
+    INC_r(cpu_ptr->regSP); \
+    cpu_ptr->regPC = FETCH_16BIT_VAL(mmap_ptr, cpu_ptr->regPC); \
+    INC_r(cpu_ptr->regSP);
 
 #define PUSH_rr(reg_high, reg_low, mmap_ptr, reg_sp) \
     DEC_r(reg_sp); \

@@ -91,6 +91,9 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
         case 0x22:
             LDI_addr_r(mmap, cpu->regH, cpu->regL, cpu->regA);
             break;
+        case 0x23:
+            INC_rr(cpu->regH, cpu->regL);
+            break;
         case 0x26:
             LD_r_n(cpu->regH, cpu, mmap);
             cpu->regPC++;
@@ -130,6 +133,9 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
             break;
         case 0xC5:
             PUSH_rr(cpu->regB, cpu->regC, mmap, cpu->regSP);
+            break;
+        case 0xC9:
+            RET(mmap, cpu);
             break;
         case 0xCD:
             CALL_nn(mmap, cpu->regSP, cpu);
@@ -233,10 +239,10 @@ void debug_cpu(uint8_t * mmap, struct Cpu * cpu)
     printf("    reg H = 0x%x \n", cpu->regH);
     printf("    reg L = 0x%x \n", cpu->regL);
     printf("    reg A = 0x%x \n \n", cpu->regA);
-    printf("    FLAG Z = 0x%x \n", cpu->FLAG & 0b10000000 >> 7);
-    printf("    FLAG N = 0x%x \n", cpu->FLAG & 0b01000000 >> 6);
-    printf("    FLAG H = 0x%x \n", cpu->FLAG & 0b00100000 >> 5);
-    printf("    FLAG C = 0x%x \n \n", cpu->FLAG & 0b00010000 >> 4);
+    printf("    FLAG Z = 0x%x \n", (cpu->FLAG & 0b10000000) >> 7);
+    printf("    FLAG N = 0x%x \n", (cpu->FLAG & 0b01000000) >> 6);
+    printf("    FLAG H = 0x%x \n", (cpu->FLAG & 0b00100000) >> 5);
+    printf("    FLAG C = 0x%x \n \n", (cpu->FLAG & 0b00010000) >> 4);
     printf("    sp = 0x%x \n", cpu->regSP);
     printf("    pc = 0x%x \n", cpu->regPC);
     // current instruction opcode
