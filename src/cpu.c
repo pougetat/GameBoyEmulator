@@ -113,7 +113,7 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
             LD_addr_r(mmap, REG_PAIR_VAL(cpu->regH, cpu->regL), cpu->regA);
             break;
         case 0xA8 ... 0xAD: 
-            XOR_A(cpu->regA, get_reg_by_num(cpu, opcode & 0xF));
+            XOR_A(cpu->regA, *get_reg_by_num(cpu, opcode & 0xF));
             break;
         case 0xAE:
             XOR_A(cpu->regA, REG_PAIR_VAL(cpu->regH, cpu->regL));
@@ -142,29 +142,32 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
 
             switch(opcode)
             {
+                case 0x10 ... 0x15:
+                     // RL(get_reg_by_num(cpu, opcode & 0xF), cpu);
+                    break;
                 case 0x40 ... 0x45:
-                    BIT(0, get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
+                    BIT(0, *get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
                     break;
                 case 0x48 ... 0x4D:
-                    BIT(1, get_reg_by_num(cpu, opcode & 0b111), cpu->FLAG);
+                    BIT(1, *get_reg_by_num(cpu, opcode & 0b111), cpu->FLAG);
                     break;
                 case 0x50 ... 0x55:
-                    BIT(2, get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
+                    BIT(2, *get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
                     break;
                 case 0x58 ... 0x5D:
-                    BIT(3, get_reg_by_num(cpu, opcode & 0b111), cpu->FLAG);
+                    BIT(3, *get_reg_by_num(cpu, opcode & 0b111), cpu->FLAG);
                     break;
                 case 0x60 ... 0x65:
-                    BIT(4, get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
+                    BIT(4, *get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
                     break;
                 case 0x68 ... 0x6D:
-                    BIT(5, get_reg_by_num(cpu, opcode & 0b111), cpu->FLAG);
+                    BIT(5, *get_reg_by_num(cpu, opcode & 0b111), cpu->FLAG);
                     break;
                 case 0x70 ... 0x75:
-                    BIT(6, get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
+                    BIT(6, *get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
                     break;
                 case 0x78 ... 0x7D:
-                    BIT(7, get_reg_by_num(cpu, opcode & 0b111), cpu->FLAG);
+                    BIT(7, *get_reg_by_num(cpu, opcode & 0b111), cpu->FLAG);
                     break;
                 default:
                     printf("%i", 0/0);
@@ -180,35 +183,35 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
     debug_cpu(mmap, cpu);
 }
 
-uint8_t get_reg_by_num(struct Cpu * cpu, uint8_t reg_num)
+uint8_t * get_reg_by_num(struct Cpu * cpu, uint8_t reg_num)
 {
     if (reg_num == 0)
     {
-        return cpu->regB;
+        return &(cpu->regB);
     }
     else if (reg_num == 1)
     {
-        return cpu->regC;
+        return &(cpu->regC);
     }
     else if (reg_num == 2)
     {
-        return cpu->regD;
+        return &(cpu->regD);
     }
     else if (reg_num == 3)
     {
-        return cpu->regE;
+        return &(cpu->regE);
     }
     else if (reg_num == 4)
     {
-        return cpu->regH;
+        return &(cpu->regH);
     }
     else if (reg_num == 5)
     {
-        return cpu->regL;
+        return &(cpu->regL);
     }
     else if (reg_num == 6)
     {
-        return cpu->regA;
+        return &(cpu->regA);
     }
 }
 

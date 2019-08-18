@@ -72,7 +72,7 @@
     reg--;
 
 #define JR_NZ_sn(cpu_ptr, mmap_ptr) \
-    if (TEST_BIT_IS_0(7, cpu->FLAG)) \
+    if (TEST_BIT_IS_0(cpu->FLAG, 7)) \
     { \
         cpu->regPC += FETCH_SIGNED_8BIT_VAL(mmap_ptr, cpu->regPC); \
     }
@@ -81,9 +81,16 @@
 #define XOR_A(regA, reg) \
     regA = regA ^ reg;
 
-// sets the zero flag (bit 7 of reg FLAG) to value of TEST_BIT_IS_0
+// rotate register left
+#define RL(reg_ptr, cpu_ptr) \
+    cpu_ptr->FLAG |= (*reg_ptr >> 7) << 7; \
+    *reg_ptr = *reg_ptr << 1;
+
+// Z <- TEST_BIT_IS_0(bit_num, register)
+// N <- reset
+// H <- set
 #define BIT(bit_num, reg, flag_reg) \
-    if (TEST_BIT_IS_0(bit_num, reg)) \
+    if (TEST_BIT_IS_0(reg, bit_num)) \
     { \
         flag_reg |= 1 << 7; \
         \
@@ -91,9 +98,11 @@
     else \
     { \
         flag_reg = flag_reg << 1 >> 1; \
-    }
+    } \
+    flag_reg &= 0b10111111; \
+    flag_reg |= 0b00100000;
 
-#define TEST_BIT_IS_0(bit_num, reg) \
+#define TEST_BIT_IS_0(reg, bit_num) \
     ((reg >> bit_num) ^ 0x1)
 
 #define CALL_nn(mmap_ptr, reg_sp, cpu_ptr) \
