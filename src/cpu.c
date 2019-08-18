@@ -232,8 +232,11 @@ void debug_cpu(uint8_t * mmap, struct Cpu * cpu)
     printf("    reg E = 0x%x \n", cpu->regE);
     printf("    reg H = 0x%x \n", cpu->regH);
     printf("    reg L = 0x%x \n", cpu->regL);
-    printf("    reg A = 0x%x \n", cpu->regA);
-    printf("    reg FLAG = 0x%x \n", cpu->FLAG);
+    printf("    reg A = 0x%x \n \n", cpu->regA);
+    printf("    FLAG Z = 0x%x \n", cpu->FLAG & 0b10000000 >> 7);
+    printf("    FLAG N = 0x%x \n", cpu->FLAG & 0b01000000 >> 6);
+    printf("    FLAG H = 0x%x \n", cpu->FLAG & 0b00100000 >> 5);
+    printf("    FLAG C = 0x%x \n \n", cpu->FLAG & 0b00010000 >> 4);
     printf("    sp = 0x%x \n", cpu->regSP);
     printf("    pc = 0x%x \n", cpu->regPC);
     // current instruction opcode
