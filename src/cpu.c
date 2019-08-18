@@ -4,7 +4,8 @@
 #include "cpu.h"
 #include "cpu_instructions.h"
 
-struct Cpu * init_cpu() {
+struct Cpu * init_cpu()
+{
     struct Cpu * cpu = malloc(sizeof(struct Cpu));
 
     cpu->regB = 0;
@@ -68,6 +69,9 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
         case 0x16:
             LD_r_n(cpu->regD, cpu, mmap);
             cpu->regPC++;
+            break;
+        case 0x17:
+            RL_r(&(cpu->regA), cpu);
             break;
         case 0x1A:
             LD_r_addr(cpu->regA, mmap, REG_PAIR_VAL(cpu->regD, cpu->regE));
@@ -143,7 +147,7 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
             switch(opcode)
             {
                 case 0x10 ... 0x15:
-                    RL(get_reg_by_num(cpu, opcode & 0xF), cpu);
+                    RL_r(get_reg_by_num(cpu, opcode & 0xF), cpu);
                     break;
                 case 0x40 ... 0x45:
                     BIT(0, *get_reg_by_num(cpu, opcode & 0xF), cpu);

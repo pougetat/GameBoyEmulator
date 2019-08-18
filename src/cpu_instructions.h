@@ -82,7 +82,7 @@
     regA = regA ^ reg;
 
 // rotate register left
-#define RL(reg_ptr, cpu_ptr) \
+#define RL_r(reg_ptr, cpu_ptr) \
     if (*reg_ptr << 1 == 0) \
     { \
         SET_Z_FLAG(cpu_ptr, 1); \
