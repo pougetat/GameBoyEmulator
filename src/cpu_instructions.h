@@ -83,24 +83,22 @@
 
 // rotate register left
 #define RL(reg_ptr, cpu_ptr) \
-    cpu_ptr->FLAG |= (*reg_ptr >> 7) << 7; \
-    *reg_ptr = *reg_ptr << 1;
+    if (*reg_ptr << 1 == 0) \
+    { \
+        SET_Z_FLAG(cpu_ptr, 1); \
+    } \
+    SET_N_FLAG(cpu_ptr, 0); \
+    SET_H_FLAG(cpu_ptr, 0); \
+    SET_C_FLAG(cpu_ptr, *reg_ptr >> 7 & 0x1); \
+    *reg_ptr = *reg_ptr << 1; \
 
 // Z <- TEST_BIT_IS_0(bit_num, register)
 // N <- reset
 // H <- set
-#define BIT(bit_num, reg, flag_reg) \
-    if (TEST_BIT_IS_0(reg, bit_num)) \
-    { \
-        flag_reg |= 1 << 7; \
-        \
-    } \
-    else \
-    { \
-        flag_reg = flag_reg << 1 >> 1; \
-    } \
-    flag_reg &= 0b10111111; \
-    flag_reg |= 0b00100000;
+#define BIT(bit_num, reg, cpu_ptr) \
+    SET_Z_FLAG(cpu_ptr, TEST_BIT_IS_0(reg, bit_num)); \
+    SET_N_FLAG(cpu_ptr, 0); \
+    SET_H_FLAG(cpu_ptr, 1); \
 
 #define TEST_BIT_IS_0(reg, bit_num) \
     ((reg >> bit_num) ^ 0x1)

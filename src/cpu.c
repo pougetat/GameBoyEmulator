@@ -143,31 +143,31 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
             switch(opcode)
             {
                 case 0x10 ... 0x15:
-                     // RL(get_reg_by_num(cpu, opcode & 0xF), cpu);
+                    RL(get_reg_by_num(cpu, opcode & 0xF), cpu);
                     break;
                 case 0x40 ... 0x45:
-                    BIT(0, *get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
+                    BIT(0, *get_reg_by_num(cpu, opcode & 0xF), cpu);
                     break;
                 case 0x48 ... 0x4D:
-                    BIT(1, *get_reg_by_num(cpu, opcode & 0b111), cpu->FLAG);
+                    BIT(1, *get_reg_by_num(cpu, opcode & 0b111), cpu);
                     break;
                 case 0x50 ... 0x55:
-                    BIT(2, *get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
+                    BIT(2, *get_reg_by_num(cpu, opcode & 0xF), cpu);
                     break;
                 case 0x58 ... 0x5D:
-                    BIT(3, *get_reg_by_num(cpu, opcode & 0b111), cpu->FLAG);
+                    BIT(3, *get_reg_by_num(cpu, opcode & 0b111), cpu);
                     break;
                 case 0x60 ... 0x65:
-                    BIT(4, *get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
+                    BIT(4, *get_reg_by_num(cpu, opcode & 0xF), cpu);
                     break;
                 case 0x68 ... 0x6D:
-                    BIT(5, *get_reg_by_num(cpu, opcode & 0b111), cpu->FLAG);
+                    BIT(5, *get_reg_by_num(cpu, opcode & 0b111), cpu);
                     break;
                 case 0x70 ... 0x75:
-                    BIT(6, *get_reg_by_num(cpu, opcode & 0xF), cpu->FLAG);
+                    BIT(6, *get_reg_by_num(cpu, opcode & 0xF), cpu);
                     break;
                 case 0x78 ... 0x7D:
-                    BIT(7, *get_reg_by_num(cpu, opcode & 0b111), cpu->FLAG);
+                    BIT(7, *get_reg_by_num(cpu, opcode & 0b111), cpu);
                     break;
                 default:
                     printf("%i", 0/0);

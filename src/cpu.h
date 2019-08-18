@@ -19,6 +19,28 @@ struct Cpu {
 #define REG_PAIR_VAL(reg_high, reg_low) \
     (((uint16_t) reg_high << 8) | reg_low)
 
+#define SET_Z_FLAG(cpu_ptr, value) \
+    SET_FLAG_VALUE(cpu_ptr, 7, value);
+
+#define SET_N_FLAG(cpu_ptr, value) \
+    SET_FLAG_VALUE(cpu_ptr, 6, value);
+
+#define SET_H_FLAG(cpu_ptr, value) \
+    SET_FLAG_VALUE(cpu_ptr, 5, value);
+
+#define SET_C_FLAG(cpu_ptr, value) \
+    SET_FLAG_VALUE(cpu_ptr, 4, value);
+
+#define SET_FLAG_VALUE(cpu_ptr, bitnum, value) \
+    if (value == 1) \
+    { \
+        cpu_ptr->FLAG |= 0x1 << bitnum; \
+    } \
+    else \
+    { \
+        cpu_ptr->FLAG &= ~(0x1 << bitnum); \
+    } \
+
 struct Cpu * init_cpu();
 
 void execute_instruction(uint8_t * mmap, struct Cpu * cpu);
