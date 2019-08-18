@@ -125,6 +125,9 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
         case 0xAF:
             XOR_A(cpu->regA, cpu->regA);
             break;
+        case 0xC1:
+            POP_rr(cpu->regB, cpu->regC, mmap, cpu->regSP);
+            break;
         case 0xC5:
             PUSH_rr(cpu->regB, cpu->regC, mmap, cpu->regSP);
             break;

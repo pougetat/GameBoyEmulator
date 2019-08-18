@@ -113,3 +113,9 @@
     DEC_r(reg_sp); \
     STORE_16BIT_VAL(mmap_ptr, reg_sp, REG_PAIR_VAL(reg_high, reg_low)); \
     DEC_r(reg_sp);
+
+#define POP_rr(reg_high, reg_low, mmap_ptr, reg_sp) \
+    INC_r(reg_sp); \
+    reg_high = FETCH_16BIT_VAL(mmap_ptr, reg_sp) >> 8; \
+    reg_low = FETCH_16BIT_VAL(mmap_ptr, reg_sp) & 0xFF; \
+    INC_r(reg_sp);
