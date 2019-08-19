@@ -66,12 +66,12 @@ struct Cpu * init_cpu()
 #define INC_rr(reg_high, reg_low) \
     if (reg_low == 0xFF) \
     { \
-        INC_r(reg_high) \
+        reg_high++; \
         reg_low = 0; \
     } \
     else \
     { \
-        INC_r(reg_low) \
+        reg_low++; \
     }
 
 // increment register
@@ -142,9 +142,9 @@ struct Cpu * init_cpu()
     cpu->regPC = FETCH_16BIT_VAL(mmap, cpu->regPC);
 
 #define RET \
-    INC_r(cpu->regSP); \
+    cpu->regSP++; \
     cpu->regPC = FETCH_16BIT_VAL(mmap, cpu->regPC); \
-    INC_r(cpu->regSP);
+    cpu->regSP++;
 
 #define PUSH_rr(reg_high, reg_low) \
     DEC_r(cpu->regSP); \
@@ -152,10 +152,10 @@ struct Cpu * init_cpu()
     DEC_r(cpu->regSP);
 
 #define POP_rr(reg_high, reg_low) \
-    INC_r(cpu->regSP); \
+    cpu->regSP++; \
     reg_high = FETCH_16BIT_VAL(mmap, cpu->regSP) >> 8; \
     reg_low = FETCH_16BIT_VAL(mmap, cpu->regSP) & 0xFF; \
-    INC_r(cpu->regSP);
+    cpu->regSP++;
 
 /*
     An 8 bit opcode can be broken down in the following way :
