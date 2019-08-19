@@ -41,6 +41,9 @@ struct Cpu {
         cpu_ptr->FLAG &= ~(0x1 << bitnum); \
     } \
 
+#define WILL_CARRY_3_TO_4(reg) \
+    ((reg & 0b100) >> 2 == 1)
+
 struct Cpu * init_cpu();
 
 void execute_instruction(uint8_t * mmap, struct Cpu * cpu);
