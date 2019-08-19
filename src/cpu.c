@@ -91,12 +91,12 @@ struct Cpu * init_cpu()
 #define DEC_rr(reg_high, reg_low) \
     if (reg_low == 0) \
     { \
-        DEC_r(reg_high) \
+        reg_high--; \
         reg_low = 0xFF; \
     } \
     else \
     { \
-        DEC_r(reg_low) \
+        reg_low--; \
     }
 
 // decrement register

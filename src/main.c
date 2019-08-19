@@ -11,7 +11,7 @@ int main(void)
     uint8_t * mmap = init_memory_map(rom_file);
     struct Cpu * cpu = init_cpu();
 
-    while (cpu->regPC != 0x13)
+    while (cpu->regPC != 0x95)
     {
         execute_instruction(mmap, cpu);
     }
@@ -21,12 +21,11 @@ int main(void)
     execute_instruction(mmap, cpu);
     execute_instruction(mmap, cpu);
     execute_instruction(mmap, cpu);
-    execute_instruction(mmap, cpu);
-    execute_instruction(mmap, cpu);
-    execute_instruction(mmap, cpu);
 
-    printf("%x \n", mmap[0xff26]);
-    printf("%x \n", mmap[0xff11]);
+    printf("%x \n", mmap[0xff12]);
+    printf("%x \n", mmap[0xff25]);
+    printf("%x \n", mmap[0xff24]);
+    printf("%x \n", mmap[0xff47]);
 
     return 0;
 }
