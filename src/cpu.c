@@ -136,9 +136,9 @@ struct Cpu * init_cpu()
     ((reg >> bit_num) ^ 0x1)
 
 #define CALL_nn \
-    DEC_r(cpu->regSP); \
-    STORE_16BIT_VAL(mmap, cpu->regSP, cpu->regPC); \
-    DEC_r(cpu->regSP); \
+    cpu->regSP--; \
+    STORE_16BIT_VAL(mmap, cpu->regSP, cpu->regPC+2); \
+    cpu->regSP--; \
     cpu->regPC = FETCH_16BIT_VAL(mmap, cpu->regPC);
 
 #define RET \
@@ -147,9 +147,9 @@ struct Cpu * init_cpu()
     cpu->regSP++;
 
 #define PUSH_rr(reg_high, reg_low) \
-    DEC_r(cpu->regSP); \
+    cpu->regSP--; \
     STORE_16BIT_VAL(mmap, cpu->regSP, REG_PAIR_VAL(reg_high, reg_low)); \
-    DEC_r(cpu->regSP);
+    cpu->regSP--;
 
 #define POP_rr(reg_high, reg_low) \
     cpu->regSP++; \

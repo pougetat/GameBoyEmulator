@@ -16,16 +16,12 @@ int main(void)
         execute_instruction(mmap, cpu);
     }
 
-    execute_instruction(mmap, cpu);
-    execute_instruction(mmap, cpu);
-    execute_instruction(mmap, cpu);
-    execute_instruction(mmap, cpu);
-    execute_instruction(mmap, cpu);
-
     printf("%x \n", mmap[0xff12]);
     printf("%x \n", mmap[0xff25]);
     printf("%x \n", mmap[0xff24]);
     printf("%x \n", mmap[0xff47]);
+    printf("%x \n", mmap[0xfffd]);;
+    printf("%x \n", mmap[0xfffe]);;
 
     return 0;
 }
