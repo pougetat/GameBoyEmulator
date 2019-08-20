@@ -95,7 +95,10 @@ struct Cpu * init_cpu()
 
 // decrement register
 #define DEC_r(reg) \
-    reg--;
+    SET_H_FLAG(cpu, !WILL_BORROW_FROM_4(reg)); \
+    reg--; \
+    SET_Z_FLAG(cpu, (reg == 0)); \
+    SET_N_FLAG(cpu, 1);
 
 #define JR_NZ_sn \
     if (TEST_BIT_IS_0(cpu->FLAG, 7)) \

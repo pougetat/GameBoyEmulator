@@ -44,6 +44,9 @@ struct Cpu {
 #define WILL_CARRY_3_TO_4(reg) \
     ((reg & 0b100) >> 2 == 1)
 
+#define WILL_BORROW_FROM_4(reg) \
+    (reg & 0b1111 == 0b1000)
+
 struct Cpu * init_cpu();
 
 void execute_instruction(uint8_t * mmap, struct Cpu * cpu);
