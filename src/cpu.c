@@ -111,7 +111,14 @@ struct Cpu * init_cpu()
 
 // xor
 #define XOR_A(regA, reg) \
-    regA = regA ^ reg;
+    regA = regA ^ reg; \
+    if (regA == 0) \
+    { \
+        SET_Z_FLAG(cpu, 1); \
+    } \
+    SET_N_FLAG(cpu, 0); \
+    SET_H_FLAG(cpu, 0); \
+    SET_C_FLAG(cpu, 0); \
 
 // rotate register left
 #define RL_r(reg_ptr) \
