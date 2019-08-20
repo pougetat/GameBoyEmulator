@@ -76,15 +76,9 @@ struct Cpu * init_cpu()
 
 // increment register
 #define INC_r(reg) \
-    if (WILL_CARRY_3_TO_4(reg)) \
-    { \
-        SET_H_FLAG(cpu, 1); \
-    } \
+    SET_H_FLAG(cpu, WILL_CARRY_3_TO_4(reg)); \
     reg++; \
-    if (reg == 0) \
-    { \
-        SET_Z_FLAG(cpu, 1); \
-    } \
+    SET_Z_FLAG(cpu, (reg == 0)); \
     SET_N_FLAG(cpu, 0);
 
 // decrement register pair
@@ -112,20 +106,14 @@ struct Cpu * init_cpu()
 // xor
 #define XOR_A(regA, reg) \
     regA = regA ^ reg; \
-    if (regA == 0) \
-    { \
-        SET_Z_FLAG(cpu, 1); \
-    } \
+    SET_Z_FLAG(cpu, (regA == 0)); \
     SET_N_FLAG(cpu, 0); \
     SET_H_FLAG(cpu, 0); \
     SET_C_FLAG(cpu, 0); \
 
 // rotate register left
 #define RL_r(reg_ptr) \
-    if (*reg_ptr << 1 == 0) \
-    { \
-        SET_Z_FLAG(cpu, 1); \
-    } \
+    SET_Z_FLAG(cpu, (*reg_ptr << 1 == 0)); \
     SET_N_FLAG(cpu, 0); \
     SET_H_FLAG(cpu, 0); \
     SET_C_FLAG(cpu, *reg_ptr >> 7 & 0x1); \
