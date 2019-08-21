@@ -197,6 +197,9 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
             LD_rr_nn(cpu->regD, cpu->regE);
             cpu->regPC = cpu->regPC + 2;
             break;
+        case 0x13:
+            INC_rr(cpu->regD, cpu->regE);
+            break;
         case 0x0E:
             LD_r_n(cpu->regC);
             cpu->regPC++;
@@ -253,6 +256,9 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
             break;
         case 0x77:
             LD_addr_r(REG_PAIR_VAL(cpu->regH, cpu->regL), cpu->regA);
+            break;
+        case 0x78 ... 0x7D:
+            LD_r_r(cpu->regA, *get_reg_by_num(cpu, opcode & 0b111));
             break;
         case 0xA8 ... 0xAD: 
             XOR_A(cpu->regA, *get_reg_by_num(cpu, opcode & 0xF));
