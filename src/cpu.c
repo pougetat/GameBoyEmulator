@@ -141,7 +141,7 @@ struct Cpu * init_cpu()
 
 #define RET \
     cpu->regSP++; \
-    cpu->regPC = FETCH_16BIT_VAL(mmap, cpu->regPC); \
+    cpu->regPC = FETCH_16BIT_VAL(mmap, cpu->regSP); \
     cpu->regSP++;
 
 #define PUSH_rr(reg_high, reg_low) \
