@@ -114,6 +114,12 @@ struct Cpu * init_cpu()
     SET_H_FLAG(cpu, 0); \
     SET_C_FLAG(cpu, 0); \
 
+#define CP_A(value) \
+    SET_Z_FLAG(cpu, (cpu->regA == value)); \
+    SET_N_FLAG(cpu, 1); \
+    SET_H_FLAG(cpu, (int) (cpu->regA & 0xf) < (int) (value & 0xf)); \
+    SET_C_FLAG(cpu, (int) cpu->regA < (int) value);
+
 // rotate register left
 #define RL_r(reg_ptr) \
     SET_Z_FLAG(cpu, (*reg_ptr << 1 == 0)); \
@@ -290,6 +296,9 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
             break;
         case 0xF2:
             LD_r_addr(cpu->regA, 0xFF00 + cpu->regC);
+            break;
+        case 0xFE:
+            CP_A(0x34);
             break;
         case 0xCB:
             opcode = mmap[cpu->regPC++];
