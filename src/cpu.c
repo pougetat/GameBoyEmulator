@@ -106,7 +106,7 @@ struct Cpu * init_cpu()
         cpu->regPC += FETCH_SIGNED_8BIT_VAL(mmap, cpu->regPC); \
     }
 
-// xor
+// xor reg with register A
 #define XOR_A(regA, reg) \
     regA = regA ^ reg; \
     SET_Z_FLAG(cpu, (regA == 0)); \
@@ -114,6 +114,7 @@ struct Cpu * init_cpu()
     SET_H_FLAG(cpu, 0); \
     SET_C_FLAG(cpu, 0); \
 
+// compare register A with value
 #define CP_A(value) \
     SET_Z_FLAG(cpu, (cpu->regA == value)); \
     SET_N_FLAG(cpu, 1); \
@@ -298,7 +299,8 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
             LD_r_addr(cpu->regA, 0xFF00 + cpu->regC);
             break;
         case 0xFE:
-            CP_A(0x34);
+            CP_A(FETCH_8BIT_VAL(mmap, cpu->regPC));
+            cpu->regPC++;
             break;
         case 0xCB:
             opcode = mmap[cpu->regPC++];
