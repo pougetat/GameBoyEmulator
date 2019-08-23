@@ -100,11 +100,23 @@ struct Cpu * init_cpu()
     SET_Z_FLAG(cpu, (reg == 0)); \
     SET_N_FLAG(cpu, 1);
 
+// jump if Z flag not set
 #define JR_NZ_sn \
     if (TEST_BIT_IS_0(cpu->FLAG, 7)) \
     { \
         cpu->regPC += FETCH_SIGNED_8BIT_VAL(mmap, cpu->regPC); \
     }
+
+// jump if Z flag set
+#define JR_Z_sn \
+    if (!TEST_BIT_IS_0(cpu->FLAG, 7)) \
+    { \
+        cpu->regPC += FETCH_SIGNED_8BIT_VAL(mmap, cpu->regPC); \
+    }
+
+// jump
+#define JR_sn \
+    cpu->regPC += FETCH_SIGNED_8BIT_VAL(mmap, cpu->regPC);
 
 // xor reg with register A
 #define XOR_A(regA, reg) \
@@ -200,6 +212,13 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
         case 0x0c:
             INC_r(cpu->regC);
             break;
+        case 0x0D:
+            DEC_r(cpu->regC);
+            break;
+        case 0x0E:
+            LD_r_n(cpu->regC);
+            cpu->regPC++;
+            break;
         case 0x11:
             LD_rr_nn(cpu->regD, cpu->regE);
             cpu->regPC = cpu->regPC + 2;
@@ -207,16 +226,16 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
         case 0x13:
             INC_rr(cpu->regD, cpu->regE);
             break;
-        case 0x0E:
-            LD_r_n(cpu->regC);
-            cpu->regPC++;
-            break;
         case 0x16:
             LD_r_n(cpu->regD);
             cpu->regPC++;
             break;
         case 0x17:
             RL_r(&(cpu->regA));
+            break;
+        case 0x18:
+            JR_sn;
+            cpu->regPC++;
             break;
         case 0x1A:
             LD_r_addr(cpu->regA, REG_PAIR_VAL(cpu->regD, cpu->regE));
@@ -243,6 +262,10 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
             LD_r_n(cpu->regH);
             cpu->regPC++;
             break;
+        case 0x28:
+            JR_Z_sn;
+            cpu->regPC++;
+            break;
         case 0x2E:
             LD_r_n(cpu->regL);
             cpu->regPC++;
@@ -254,12 +277,21 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
         case 0x32:
             LDD_addr_r(cpu->regH, cpu->regL, cpu->regA);
             break;
+        case 0x3D:
+            DEC_r(cpu->regA);
+            break;
         case 0x3E:
             LD_r_n(cpu->regA);
             cpu->regPC++;
             break;
         case 0x4F: // ld c a
             LD_r_r(cpu->regC, cpu->regA);
+            break;
+        case 0x57:
+            LD_r_r(cpu->regD, cpu->regA);
+            break;
+        case 0x67:
+            LD_r_r(cpu->regH, cpu->regA);
             break;
         case 0x77:
             LD_addr_r(REG_PAIR_VAL(cpu->regH, cpu->regL), cpu->regA);
@@ -289,14 +321,23 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
             CALL_nn(cpu->regSP);
             break;
         case 0xE0:
-            LD_addr_r(0xFF00 + FETCH_8BIT_VAL(mmap, cpu->regPC), cpu->regA);
+            LD_addr_r(0xFF00 + ((uint16_t) FETCH_8BIT_VAL(mmap, cpu->regPC)), cpu->regA);
             cpu->regPC++;
             break;
         case 0xE2:
-            LD_addr_r(0xFF00 + cpu->regC, cpu->regA);
+            LD_addr_r(0xFF00 + ((uint16_t) cpu->regC), cpu->regA);
+            break;
+        case 0xEA:
+            LD_addr_r(FETCH_16BIT_VAL(mmap, cpu->regPC), cpu->regA);
+            cpu->regPC++;
+            cpu->regPC++;
+            break;
+        case 0xF0:
+            LD_r_addr(cpu->regA, 0xFF00 + ((uint16_t) FETCH_8BIT_VAL(mmap, cpu->regPC)));
+            cpu->regPC++;
             break;
         case 0xF2:
-            LD_r_addr(cpu->regA, 0xFF00 + cpu->regC);
+            LD_r_addr(cpu->regA, 0xFF00 + ((uint16_t) cpu->regC));
             break;
         case 0xFE:
             CP_A(FETCH_8BIT_VAL(mmap, cpu->regPC));
