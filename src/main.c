@@ -20,8 +20,8 @@ int main(void)
     printf("%x \n", memory_map[0xff25]);
     printf("%x \n", memory_map[0xff24]);
     printf("%x \n", memory_map[0xff47]);
-    printf("%x \n", memory_map[0xfffd]);;
-    printf("%x \n", memory_map[0xfffe]);;
+    printf("%x \n", memory_map[0xfffd]);
+    printf("%x \n", memory_map[0xfffe]);
 
     return 0;
 }

@@ -24,3 +24,30 @@ uint8_t * init_memory_map(FILE * rom_file)
 
     return memory_map;
 }
+
+// GB is little endian so we handle the conversion here
+uint16_t fetch_16bit_val(uint8_t * memory_map, memory_addr address)
+{
+    return ((uint16_t) memory_map[address+1]) << 8 | memory_map[address];
+}
+
+uint8_t fetch_8bit_val(uint8_t * memory_map, memory_addr address)
+{
+    return memory_map[address];
+}
+
+int8_t fetch_signed_8bit_val(uint8_t * memory_map, memory_addr address)
+{
+    return (int8_t) memory_map[address];
+}
+
+void store_8bit_val(uint8_t * memory_map, memory_addr address, uint8_t value)
+{
+    memory_map[address] = value;
+}
+
+void store_16bit_val(uint8_t * memory_map, memory_addr address, uint16_t value)
+{
+    store_8bit_val(memory_map, address, (uint8_t) (value & 0xFF));
+    store_8bit_val(memory_map, address+1, (uint8_t) (value >> 8));
+}

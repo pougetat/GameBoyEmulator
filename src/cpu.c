@@ -21,15 +21,12 @@ struct Cpu * init_cpu()
 
 /* CPU instructions */
 
-#include "memory_map.h"
-#include "cpu.h"
-
 // NOP
 #define NOP ;
 
 // register_dest <- immediate n
 #define LD_r_n(reg) \
-    reg = FETCH_8BIT_VAL(memory_map, cpu->regPC); \
+    reg = fetch_8bit_val(memory_map, cpu->regPC); \
 
 // register_dest <- register_src
 #define LD_r_r(reg_dest, reg_src) \
@@ -37,16 +34,17 @@ struct Cpu * init_cpu()
 
 // register pair <- immediate nn
 #define LD_rr_nn(reg_high, reg_low) \
-    reg_high = FETCH_16BIT_VAL(memory_map, cpu->regPC) >> 8; \
-    reg_low = FETCH_16BIT_VAL(memory_map, cpu->regPC) & 0xFF;
+    reg_high = fetch_16bit_val(memory_map, cpu->regPC) >> 8; \
+    reg_low = fetch_16bit_val(memory_map, cpu->regPC) & 0xFF;
 
 // regSP <- immediate nn
 #define LD_SP_nn \
-    cpu->regSP = FETCH_16BIT_VAL(memory_map, cpu->regPC);
+    cpu->regSP = fetch_16bit_val(memory_map, cpu->regPC);
 
 // (address) <- register
 #define LD_addr_r(address, reg) \
-    STORE_8BIT_VAL(memory_map, address, reg)
+    memory_map[address] = 0x9; \
+    store_8bit_val(memory_map, address, reg); \
 
 // register <- (address)
 #define LD_r_addr(reg, address) \
@@ -104,19 +102,19 @@ struct Cpu * init_cpu()
 #define JR_NZ_sn \
     if (TEST_BIT_IS_0(cpu->FLAG, 7)) \
     { \
-        cpu->regPC += FETCH_SIGNED_8BIT_VAL(memory_map, cpu->regPC); \
+        cpu->regPC += fetch_signed_8bit_val(memory_map, cpu->regPC); \
     }
 
 // jump if Z flag set
 #define JR_Z_sn \
     if (!TEST_BIT_IS_0(cpu->FLAG, 7)) \
     { \
-        cpu->regPC += FETCH_SIGNED_8BIT_VAL(memory_map, cpu->regPC); \
+        cpu->regPC += fetch_signed_8bit_val(memory_map, cpu->regPC); \
     }
 
 // jump
 #define JR_sn \
-    cpu->regPC += FETCH_SIGNED_8BIT_VAL(memory_map, cpu->regPC);
+    cpu->regPC += fetch_signed_8bit_val(memory_map, cpu->regPC);
 
 // xor reg with register A
 #define XOR_A(regA, reg) \
@@ -154,24 +152,24 @@ struct Cpu * init_cpu()
 
 #define CALL_nn \
     cpu->regSP--; \
-    STORE_16BIT_VAL(memory_map, cpu->regSP, cpu->regPC+2); \
+    store_16bit_val(memory_map, cpu->regSP, cpu->regPC+2); \
     cpu->regSP--; \
-    cpu->regPC = FETCH_16BIT_VAL(memory_map, cpu->regPC);
+    cpu->regPC = fetch_16bit_val(memory_map, cpu->regPC);
 
 #define RET \
     cpu->regSP++; \
-    cpu->regPC = FETCH_16BIT_VAL(memory_map, cpu->regSP); \
+    cpu->regPC = fetch_16bit_val(memory_map, cpu->regSP); \
     cpu->regSP++;
 
 #define PUSH_rr(reg_high, reg_low) \
     cpu->regSP--; \
-    STORE_16BIT_VAL(memory_map, cpu->regSP, REG_PAIR_VAL(reg_high, reg_low)); \
+    store_16bit_val(memory_map, cpu->regSP, REG_PAIR_VAL(reg_high, reg_low)); \
     cpu->regSP--;
 
 #define POP_rr(reg_high, reg_low) \
     cpu->regSP++; \
-    reg_high = FETCH_16BIT_VAL(memory_map, cpu->regSP) >> 8; \
-    reg_low = FETCH_16BIT_VAL(memory_map, cpu->regSP) & 0xFF; \
+    reg_high = fetch_16bit_val(memory_map, cpu->regSP) >> 8; \
+    reg_low = fetch_16bit_val(memory_map, cpu->regSP) & 0xFF; \
     cpu->regSP++;
 
 /*
@@ -321,26 +319,26 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu)
             CALL_nn(cpu->regSP);
             break;
         case 0xE0:
-            LD_addr_r(0xFF00 + ((uint16_t) FETCH_8BIT_VAL(memory_map, cpu->regPC)), cpu->regA);
+            LD_addr_r(0xFF00 + ((uint16_t) fetch_8bit_val(memory_map, cpu->regPC)), cpu->regA);
             cpu->regPC++;
             break;
         case 0xE2:
             LD_addr_r(0xFF00 + ((uint16_t) cpu->regC), cpu->regA);
             break;
         case 0xEA:
-            LD_addr_r(FETCH_16BIT_VAL(memory_map, cpu->regPC), cpu->regA);
+            LD_addr_r(fetch_16bit_val(memory_map, cpu->regPC), cpu->regA);
             cpu->regPC++;
             cpu->regPC++;
             break;
         case 0xF0:
-            LD_r_addr(cpu->regA, 0xFF00 + ((uint16_t) FETCH_8BIT_VAL(memory_map, cpu->regPC)));
+            LD_r_addr(cpu->regA, 0xFF00 + ((uint16_t) fetch_8bit_val(memory_map, cpu->regPC)));
             cpu->regPC++;
             break;
         case 0xF2:
             LD_r_addr(cpu->regA, 0xFF00 + ((uint16_t) cpu->regC));
             break;
         case 0xFE:
-            CP_A(FETCH_8BIT_VAL(memory_map, cpu->regPC));
+            CP_A(fetch_8bit_val(memory_map, cpu->regPC));
             cpu->regPC++;
             break;
         case 0xCB:
