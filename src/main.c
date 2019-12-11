@@ -6,7 +6,7 @@
 
 int main(void)
 {
-    FILE * rom_file = fopen("simple.gb", "r");
+    FILE * rom_file = fopen("../testRoms/simple.gb", "r");
 
     uint8_t * mmap = init_memory_map(rom_file);
     struct Cpu * cpu = init_cpu();
