@@ -5,28 +5,30 @@
 
 struct Cpu * init_cpu()
 {
-    struct Cpu * cpu = malloc(sizeof(struct Cpu));
+    struct Cpu * cpu_ptr = malloc(sizeof(struct Cpu));
 
-    cpu->regB = 0;
-    cpu->regC = 0;
-    cpu->regD = 0;
-    cpu->regE = 0;
-    cpu->regH = 0;
-    cpu->regL = 0;
-    cpu->regSP = 0;
-    cpu->regPC = 0;
+    cpu_ptr->regB = 0;
+    cpu_ptr->regC = 0;
+    cpu_ptr->regD = 0;
+    cpu_ptr->regE = 0;
+    cpu_ptr->regH = 0;
+    cpu_ptr->regL = 0;
+    cpu_ptr->regSP = 0;
+    cpu_ptr->regPC = 0;
 
-    return cpu;
+    return cpu_ptr;
 }
 
 /* CPU instructions */
 
 // NOP
-#define NOP ;
+void nop(){}
 
 // register_dest <- immediate n
-#define LD_r_n(reg) \
-    reg = fetch_8bit_val(memory_map, cpu->regPC); \
+void ld_r_n(uint8_t * reg_ptr, struct Cpu * cpu_ptr, uint8_t * memory_map)
+{
+    *reg_ptr = fetch_8bit_val(memory_map, cpu_ptr->regPC);
+}
 
 // register_dest <- register_src
 #define LD_r_r(reg_dest, reg_src) \
@@ -34,12 +36,12 @@ struct Cpu * init_cpu()
 
 // register pair <- immediate nn
 #define LD_rr_nn(reg_high, reg_low) \
-    reg_high = fetch_16bit_val(memory_map, cpu->regPC) >> 8; \
-    reg_low = fetch_16bit_val(memory_map, cpu->regPC) & 0xFF;
+    reg_high = fetch_16bit_val(memory_map, cpu_ptr->regPC) >> 8; \
+    reg_low = fetch_16bit_val(memory_map, cpu_ptr->regPC) & 0xFF;
 
 // regSP <- immediate nn
 #define LD_SP_nn \
-    cpu->regSP = fetch_16bit_val(memory_map, cpu->regPC);
+    cpu_ptr->regSP = fetch_16bit_val(memory_map, cpu_ptr->regPC);
 
 // (address) <- register
 #define LD_addr_r(address, reg) \
@@ -74,10 +76,10 @@ struct Cpu * init_cpu()
 
 // increment register
 #define INC_r(reg) \
-    SET_H_FLAG(cpu, WILL_CARRY_3_TO_4(reg)); \
+    SET_H_FLAG(cpu_ptr, WILL_CARRY_3_TO_4(reg)); \
     reg++; \
-    SET_Z_FLAG(cpu, (reg == 0)); \
-    SET_N_FLAG(cpu, 0);
+    SET_Z_FLAG(cpu_ptr, (reg == 0)); \
+    SET_N_FLAG(cpu_ptr, 0);
 
 // decrement register pair
 #define DEC_rr(reg_high, reg_low) \
@@ -93,84 +95,84 @@ struct Cpu * init_cpu()
 
 // decrement register
 #define DEC_r(reg) \
-    SET_H_FLAG(cpu, !WILL_BORROW_FROM_4(reg)); \
+    SET_H_FLAG(cpu_ptr, !WILL_BORROW_FROM_4(reg)); \
     reg--; \
-    SET_Z_FLAG(cpu, (reg == 0)); \
-    SET_N_FLAG(cpu, 1);
+    SET_Z_FLAG(cpu_ptr, (reg == 0)); \
+    SET_N_FLAG(cpu_ptr, 1);
 
 // jump if Z flag not set
 #define JR_NZ_sn \
-    if (TEST_BIT_IS_0(cpu->FLAG, 7)) \
+    if (TEST_BIT_IS_0(cpu_ptr->FLAG, 7)) \
     { \
-        cpu->regPC += fetch_signed_8bit_val(memory_map, cpu->regPC); \
+        cpu_ptr->regPC += fetch_signed_8bit_val(memory_map, cpu_ptr->regPC); \
     }
 
 // jump if Z flag set
 #define JR_Z_sn \
-    if (!TEST_BIT_IS_0(cpu->FLAG, 7)) \
+    if (!TEST_BIT_IS_0(cpu_ptr->FLAG, 7)) \
     { \
-        cpu->regPC += fetch_signed_8bit_val(memory_map, cpu->regPC); \
+        cpu_ptr->regPC += fetch_signed_8bit_val(memory_map, cpu_ptr->regPC); \
     }
 
 // jump
 #define JR_sn \
-    cpu->regPC += fetch_signed_8bit_val(memory_map, cpu->regPC);
+    cpu_ptr->regPC += fetch_signed_8bit_val(memory_map, cpu_ptr->regPC);
 
 // xor reg with register A
 #define XOR_A(regA, reg) \
     regA = regA ^ reg; \
-    SET_Z_FLAG(cpu, (regA == 0)); \
-    SET_N_FLAG(cpu, 0); \
-    SET_H_FLAG(cpu, 0); \
-    SET_C_FLAG(cpu, 0); \
+    SET_Z_FLAG(cpu_ptr, (regA == 0)); \
+    SET_N_FLAG(cpu_ptr, 0); \
+    SET_H_FLAG(cpu_ptr, 0); \
+    SET_C_FLAG(cpu_ptr, 0); \
 
 // compare register A with value
 #define CP_A(value) \
-    SET_Z_FLAG(cpu, (cpu->regA == value)); \
-    SET_N_FLAG(cpu, 1); \
-    SET_H_FLAG(cpu, (int) (cpu->regA & 0xf) < (int) (value & 0xf)); \
-    SET_C_FLAG(cpu, (int) cpu->regA < (int) value);
+    SET_Z_FLAG(cpu_ptr, (cpu_ptr->regA == value)); \
+    SET_N_FLAG(cpu_ptr, 1); \
+    SET_H_FLAG(cpu_ptr, (int) (cpu_ptr->regA & 0xf) < (int) (value & 0xf)); \
+    SET_C_FLAG(cpu_ptr, (int) cpu_ptr->regA < (int) value);
 
 // rotate register left
 #define RL_r(reg_ptr) \
-    SET_Z_FLAG(cpu, (*reg_ptr << 1 == 0)); \
-    SET_N_FLAG(cpu, 0); \
-    SET_H_FLAG(cpu, 0); \
-    SET_C_FLAG(cpu, *reg_ptr >> 7 & 0x1); \
+    SET_Z_FLAG(cpu_ptr, (*reg_ptr << 1 == 0)); \
+    SET_N_FLAG(cpu_ptr, 0); \
+    SET_H_FLAG(cpu_ptr, 0); \
+    SET_C_FLAG(cpu_ptr, *reg_ptr >> 7 & 0x1); \
     *reg_ptr = *reg_ptr << 1; \
 
 // Z <- TEST_BIT_IS_0(bit_num, register)
 // N <- reset
 // H <- set
 #define BIT(bit_num, reg) \
-    SET_Z_FLAG(cpu, TEST_BIT_IS_0(reg, bit_num)); \
-    SET_N_FLAG(cpu, 0); \
-    SET_H_FLAG(cpu, 1);
+    SET_Z_FLAG(cpu_ptr, TEST_BIT_IS_0(reg, bit_num)); \
+    SET_N_FLAG(cpu_ptr, 0); \
+    SET_H_FLAG(cpu_ptr, 1);
 
 #define TEST_BIT_IS_0(reg, bit_num) \
     ((reg >> bit_num) ^ 0x1)
 
 #define CALL_nn \
-    cpu->regSP--; \
-    store_16bit_val(memory_map, cpu->regSP, cpu->regPC+2); \
-    cpu->regSP--; \
-    cpu->regPC = fetch_16bit_val(memory_map, cpu->regPC);
+    cpu_ptr->regSP--; \
+    store_16bit_val(memory_map, cpu_ptr->regSP, cpu_ptr->regPC+2); \
+    cpu_ptr->regSP--; \
+    cpu_ptr->regPC = fetch_16bit_val(memory_map, cpu_ptr->regPC);
 
 #define RET \
-    cpu->regSP++; \
-    cpu->regPC = fetch_16bit_val(memory_map, cpu->regSP); \
-    cpu->regSP++;
+    cpu_ptr->regSP++; \
+    cpu_ptr->regPC = fetch_16bit_val(memory_map, cpu_ptr->regSP); \
+    cpu_ptr->regSP++;
 
 #define PUSH_rr(reg_high, reg_low) \
-    cpu->regSP--; \
-    store_16bit_val(memory_map, cpu->regSP, REG_PAIR_VAL(reg_high, reg_low)); \
-    cpu->regSP--;
+    cpu_ptr->regSP--; \
+    store_16bit_val(memory_map, cpu_ptr->regSP, REG_PAIR_VAL(reg_high, reg_low)); \
+    cpu_ptr->regSP--;
 
 #define POP_rr(reg_high, reg_low) \
-    cpu->regSP++; \
-    reg_high = fetch_16bit_val(memory_map, cpu->regSP) >> 8; \
-    reg_low = fetch_16bit_val(memory_map, cpu->regSP) & 0xFF; \
-    cpu->regSP++;
+    cpu_ptr->regSP++; \
+    reg_high = fetch_16bit_val(memory_map, cpu_ptr->regSP) >> 8; \
+    reg_low = fetch_16bit_val(memory_map, cpu_ptr->regSP) & 0xFF; \
+    cpu_ptr->regSP++;
 
 /*
     An 8 bit opcode can be broken down in the following way :
@@ -178,200 +180,200 @@ struct Cpu * init_cpu()
     |  x  |    y   |    z   |
           |  p  | q|
 */
-void execute_instruction(uint8_t * memory_map, struct Cpu * cpu)
+void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
 {
-    uint8_t opcode = memory_map[cpu->regPC++];
+    uint8_t opcode = memory_map[cpu_ptr->regPC++];
 
     switch (opcode)
     {
         case 0x00:
-            NOP;
+            nop();
             break;
         case 0x01:
-            LD_rr_nn(cpu->regB, cpu->regC);
-            cpu->regPC = cpu->regPC + 2;
+            LD_rr_nn(cpu_ptr->regB, cpu_ptr->regC);
+            cpu_ptr->regPC = cpu_ptr->regPC + 2;
             break;
         case 0x02:
-            LD_addr_r(REG_PAIR_VAL(cpu->regB, cpu->regC), cpu->regA);
+            LD_addr_r(REG_PAIR_VAL(cpu_ptr->regB, cpu_ptr->regC), cpu_ptr->regA);
             break;
         case 0x03:
-            INC_rr(cpu->regB, cpu->regC);
+            INC_rr(cpu_ptr->regB, cpu_ptr->regC);
             break;
         case 0x04:
-            INC_r(cpu->regB);
+            INC_r(cpu_ptr->regB);
             break;
         case 0x05:
-            DEC_r(cpu->regB);
+            DEC_r(cpu_ptr->regB);
             break;
         case 0x06:
-            LD_r_n(cpu->regB);
-            cpu->regPC++;
+            ld_r_n(&(cpu_ptr->regB), cpu_ptr, memory_map);
+            cpu_ptr->regPC++;
             break;
         case 0x0c:
-            INC_r(cpu->regC);
+            INC_r(cpu_ptr->regC);
             break;
         case 0x0D:
-            DEC_r(cpu->regC);
+            DEC_r(cpu_ptr->regC);
             break;
         case 0x0E:
-            LD_r_n(cpu->regC);
-            cpu->regPC++;
+            ld_r_n(&(cpu_ptr->regC), cpu_ptr, memory_map);            
+            cpu_ptr->regPC++;
             break;
         case 0x11:
-            LD_rr_nn(cpu->regD, cpu->regE);
-            cpu->regPC = cpu->regPC + 2;
+            LD_rr_nn(cpu_ptr->regD, cpu_ptr->regE);
+            cpu_ptr->regPC = cpu_ptr->regPC + 2;
             break;
         case 0x13:
-            INC_rr(cpu->regD, cpu->regE);
+            INC_rr(cpu_ptr->regD, cpu_ptr->regE);
             break;
         case 0x16:
-            LD_r_n(cpu->regD);
-            cpu->regPC++;
+            ld_r_n(&(cpu_ptr->regD), cpu_ptr, memory_map);                        
+            cpu_ptr->regPC++;
             break;
         case 0x17:
-            RL_r(&(cpu->regA));
+            RL_r(&(cpu_ptr->regA));
             break;
         case 0x18:
             JR_sn;
-            cpu->regPC++;
+            cpu_ptr->regPC++;
             break;
         case 0x1A:
-            LD_r_addr(cpu->regA, REG_PAIR_VAL(cpu->regD, cpu->regE));
+            LD_r_addr(cpu_ptr->regA, REG_PAIR_VAL(cpu_ptr->regD, cpu_ptr->regE));
             break;
         case 0x1E:
-            LD_r_n(cpu->regE);
-            cpu->regPC++;
+            ld_r_n(&(cpu_ptr->regE), cpu_ptr, memory_map);            
+            cpu_ptr->regPC++;
             break;
         case 0x20:
             JR_NZ_sn;
-            cpu->regPC++;
+            cpu_ptr->regPC++;
             break;
         case 0x21:
-            LD_rr_nn(cpu->regH, cpu->regL);
-            cpu->regPC = cpu->regPC + 2;
+            LD_rr_nn(cpu_ptr->regH, cpu_ptr->regL);
+            cpu_ptr->regPC = cpu_ptr->regPC + 2;
             break;
         case 0x22:
-            LDI_addr_r(cpu->regH, cpu->regL, cpu->regA);
+            LDI_addr_r(cpu_ptr->regH, cpu_ptr->regL, cpu_ptr->regA);
             break;
         case 0x23:
-            INC_rr(cpu->regH, cpu->regL);
+            INC_rr(cpu_ptr->regH, cpu_ptr->regL);
             break;
         case 0x26:
-            LD_r_n(cpu->regH);
-            cpu->regPC++;
+            ld_r_n(&(cpu_ptr->regH), cpu_ptr, memory_map);            
+            cpu_ptr->regPC++;
             break;
         case 0x28:
             JR_Z_sn;
-            cpu->regPC++;
+            cpu_ptr->regPC++;
             break;
         case 0x2E:
-            LD_r_n(cpu->regL);
-            cpu->regPC++;
+            ld_r_n(&(cpu_ptr->regL), cpu_ptr, memory_map);                        
+            cpu_ptr->regPC++;
             break;
         case 0x31:
             LD_SP_nn;
-            cpu->regPC = cpu->regPC + 2;
+            cpu_ptr->regPC = cpu_ptr->regPC + 2;
             break;
         case 0x32:
-            LDD_addr_r(cpu->regH, cpu->regL, cpu->regA);
+            LDD_addr_r(cpu_ptr->regH, cpu_ptr->regL, cpu_ptr->regA);
             break;
         case 0x3D:
-            DEC_r(cpu->regA);
+            DEC_r(cpu_ptr->regA);
             break;
         case 0x3E:
-            LD_r_n(cpu->regA);
-            cpu->regPC++;
+            ld_r_n(&(cpu_ptr->regA), cpu_ptr, memory_map);                        
+            cpu_ptr->regPC++;
             break;
         case 0x4F: // ld c a
-            LD_r_r(cpu->regC, cpu->regA);
+            LD_r_r(cpu_ptr->regC, cpu_ptr->regA);
             break;
         case 0x57:
-            LD_r_r(cpu->regD, cpu->regA);
+            LD_r_r(cpu_ptr->regD, cpu_ptr->regA);
             break;
         case 0x67:
-            LD_r_r(cpu->regH, cpu->regA);
+            LD_r_r(cpu_ptr->regH, cpu_ptr->regA);
             break;
         case 0x77:
-            LD_addr_r(REG_PAIR_VAL(cpu->regH, cpu->regL), cpu->regA);
+            LD_addr_r(REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL), cpu_ptr->regA);
             break;
         case 0x78 ... 0x7D:
-            LD_r_r(cpu->regA, *get_reg_by_num(cpu, opcode & 0b111));
+            LD_r_r(cpu_ptr->regA, *get_reg_by_num(cpu_ptr, opcode & 0b111));
             break;
         case 0xA8 ... 0xAD: 
-            XOR_A(cpu->regA, *get_reg_by_num(cpu, opcode & 0xF));
+            XOR_A(cpu_ptr->regA, *get_reg_by_num(cpu_ptr, opcode & 0xF));
             break;
         case 0xAE:
-            XOR_A(cpu->regA, REG_PAIR_VAL(cpu->regH, cpu->regL));
+            XOR_A(cpu_ptr->regA, REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL));
             break;
         case 0xAF:
-            XOR_A(cpu->regA, cpu->regA);
+            XOR_A(cpu_ptr->regA, cpu_ptr->regA);
             break;
         case 0xC1:
-            POP_rr(cpu->regB, cpu->regC);
+            POP_rr(cpu_ptr->regB, cpu_ptr->regC);
             break;
         case 0xC5:
-            PUSH_rr(cpu->regB, cpu->regC);
+            PUSH_rr(cpu_ptr->regB, cpu_ptr->regC);
             break;
         case 0xC9:
             RET;
             break;
         case 0xCD:
-            CALL_nn(cpu->regSP);
+            CALL_nn(cpu_ptr->regSP);
             break;
         case 0xE0:
-            LD_addr_r(0xFF00 + ((uint16_t) fetch_8bit_val(memory_map, cpu->regPC)), cpu->regA);
-            cpu->regPC++;
+            LD_addr_r(0xFF00 + ((uint16_t) fetch_8bit_val(memory_map, cpu_ptr->regPC)), cpu_ptr->regA);
+            cpu_ptr->regPC++;
             break;
         case 0xE2:
-            LD_addr_r(0xFF00 + ((uint16_t) cpu->regC), cpu->regA);
+            LD_addr_r(0xFF00 + ((uint16_t) cpu_ptr->regC), cpu_ptr->regA);
             break;
         case 0xEA:
-            LD_addr_r(fetch_16bit_val(memory_map, cpu->regPC), cpu->regA);
-            cpu->regPC++;
-            cpu->regPC++;
+            LD_addr_r(fetch_16bit_val(memory_map, cpu_ptr->regPC), cpu_ptr->regA);
+            cpu_ptr->regPC++;
+            cpu_ptr->regPC++;
             break;
         case 0xF0:
-            LD_r_addr(cpu->regA, 0xFF00 + ((uint16_t) fetch_8bit_val(memory_map, cpu->regPC)));
-            cpu->regPC++;
+            LD_r_addr(cpu_ptr->regA, 0xFF00 + ((uint16_t) fetch_8bit_val(memory_map, cpu_ptr->regPC)));
+            cpu_ptr->regPC++;
             break;
         case 0xF2:
-            LD_r_addr(cpu->regA, 0xFF00 + ((uint16_t) cpu->regC));
+            LD_r_addr(cpu_ptr->regA, 0xFF00 + ((uint16_t) cpu_ptr->regC));
             break;
         case 0xFE:
-            CP_A(fetch_8bit_val(memory_map, cpu->regPC));
-            cpu->regPC++;
+            CP_A(fetch_8bit_val(memory_map, cpu_ptr->regPC));
+            cpu_ptr->regPC++;
             break;
         case 0xCB:
-            opcode = memory_map[cpu->regPC++];
+            opcode = memory_map[cpu_ptr->regPC++];
 
             switch(opcode)
             {
                 case 0x10 ... 0x15:
-                    RL_r(get_reg_by_num(cpu, opcode & 0xF));
+                    RL_r(get_reg_by_num(cpu_ptr, opcode & 0xF));
                     break;
                 case 0x40 ... 0x45:
-                    BIT(0, *get_reg_by_num(cpu, opcode & 0xF));
+                    BIT(0, *get_reg_by_num(cpu_ptr, opcode & 0xF));
                     break;
                 case 0x48 ... 0x4D:
-                    BIT(1, *get_reg_by_num(cpu, opcode & 0b111));
+                    BIT(1, *get_reg_by_num(cpu_ptr, opcode & 0b111));
                     break;
                 case 0x50 ... 0x55:
-                    BIT(2, *get_reg_by_num(cpu, opcode & 0xF));
+                    BIT(2, *get_reg_by_num(cpu_ptr, opcode & 0xF));
                     break;
                 case 0x58 ... 0x5D:
-                    BIT(3, *get_reg_by_num(cpu, opcode & 0b111));
+                    BIT(3, *get_reg_by_num(cpu_ptr, opcode & 0b111));
                     break;
                 case 0x60 ... 0x65:
-                    BIT(4, *get_reg_by_num(cpu, opcode & 0xF));
+                    BIT(4, *get_reg_by_num(cpu_ptr, opcode & 0xF));
                     break;
                 case 0x68 ... 0x6D:
-                    BIT(5, *get_reg_by_num(cpu, opcode & 0b111));
+                    BIT(5, *get_reg_by_num(cpu_ptr, opcode & 0b111));
                     break;
                 case 0x70 ... 0x75:
-                    BIT(6, *get_reg_by_num(cpu, opcode & 0xF));
+                    BIT(6, *get_reg_by_num(cpu_ptr, opcode & 0xF));
                     break;
                 case 0x78 ... 0x7D:
-                    BIT(7, *get_reg_by_num(cpu, opcode & 0b111));
+                    BIT(7, *get_reg_by_num(cpu_ptr, opcode & 0b111));
                     break;
                 default:
                     printf("%i", 0/0);
@@ -384,60 +386,60 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu)
             break;
     }
 
-    debug_cpu(memory_map, cpu);
+    debug_cpu(memory_map, cpu_ptr);
 }
 
-uint8_t * get_reg_by_num(struct Cpu * cpu, uint8_t reg_num)
+uint8_t * get_reg_by_num(struct Cpu * cpu_ptr, uint8_t reg_num)
 {
     if (reg_num == 0)
     {
-        return &(cpu->regB);
+        return &(cpu_ptr->regB);
     }
     else if (reg_num == 1)
     {
-        return &(cpu->regC);
+        return &(cpu_ptr->regC);
     }
     else if (reg_num == 2)
     {
-        return &(cpu->regD);
+        return &(cpu_ptr->regD);
     }
     else if (reg_num == 3)
     {
-        return &(cpu->regE);
+        return &(cpu_ptr->regE);
     }
     else if (reg_num == 4)
     {
-        return &(cpu->regH);
+        return &(cpu_ptr->regH);
     }
     else if (reg_num == 5)
     {
-        return &(cpu->regL);
+        return &(cpu_ptr->regL);
     }
     else if (reg_num == 6)
     {
-        return &(cpu->regA);
+        return &(cpu_ptr->regA);
     }
 }
 
-void debug_cpu(uint8_t * memory_map, struct Cpu * cpu)
+void debug_cpu(uint8_t * memory_map, struct Cpu * cpu_ptr)
 {
     printf("CPU state : \n \n");
     // register values
-    printf("    reg B = 0x%x \n", cpu->regB);
-    printf("    reg C = 0x%x \n", cpu->regC);
-    printf("    reg D = 0x%x \n", cpu->regD);
-    printf("    reg E = 0x%x \n", cpu->regE);
-    printf("    reg H = 0x%x \n", cpu->regH);
-    printf("    reg L = 0x%x \n", cpu->regL);
-    printf("    reg A = 0x%x \n \n", cpu->regA);
-    printf("    FLAG Z = 0x%x \n", (cpu->FLAG & 0b10000000) >> 7);
-    printf("    FLAG N = 0x%x \n", (cpu->FLAG & 0b01000000) >> 6);
-    printf("    FLAG H = 0x%x \n", (cpu->FLAG & 0b00100000) >> 5);
-    printf("    FLAG C = 0x%x \n \n", (cpu->FLAG & 0b00010000) >> 4);
-    printf("    sp = 0x%x \n", cpu->regSP);
-    printf("    pc = 0x%x \n", cpu->regPC);
+    printf("    reg B = 0x%x \n", cpu_ptr->regB);
+    printf("    reg C = 0x%x \n", cpu_ptr->regC);
+    printf("    reg D = 0x%x \n", cpu_ptr->regD);
+    printf("    reg E = 0x%x \n", cpu_ptr->regE);
+    printf("    reg H = 0x%x \n", cpu_ptr->regH);
+    printf("    reg L = 0x%x \n", cpu_ptr->regL);
+    printf("    reg A = 0x%x \n \n", cpu_ptr->regA);
+    printf("    FLAG Z = 0x%x \n", (cpu_ptr->FLAG & 0b10000000) >> 7);
+    printf("    FLAG N = 0x%x \n", (cpu_ptr->FLAG & 0b01000000) >> 6);
+    printf("    FLAG H = 0x%x \n", (cpu_ptr->FLAG & 0b00100000) >> 5);
+    printf("    FLAG C = 0x%x \n \n", (cpu_ptr->FLAG & 0b00010000) >> 4);
+    printf("    sp = 0x%x \n", cpu_ptr->regSP);
+    printf("    pc = 0x%x \n", cpu_ptr->regPC);
     // current instruction opcode
-    printf("    pc instruction: 0x%x \n", memory_map[cpu->regPC]);
+    printf("    pc instruction: 0x%x \n", memory_map[cpu_ptr->regPC]);
 
     printf("\n");
 }
