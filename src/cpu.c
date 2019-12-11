@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include "mmap.h"
+#include "memory_map.h"
 #include "cpu.h"
 
 struct Cpu * init_cpu()
@@ -21,7 +21,7 @@ struct Cpu * init_cpu()
 
 /* CPU instructions */
 
-#include "mmap.h"
+#include "memory_map.h"
 #include "cpu.h"
 
 // NOP
@@ -29,7 +29,7 @@ struct Cpu * init_cpu()
 
 // register_dest <- immediate n
 #define LD_r_n(reg) \
-    reg = FETCH_8BIT_VAL(mmap, cpu->regPC); \
+    reg = FETCH_8BIT_VAL(memory_map, cpu->regPC); \
 
 // register_dest <- register_src
 #define LD_r_r(reg_dest, reg_src) \
@@ -37,20 +37,20 @@ struct Cpu * init_cpu()
 
 // register pair <- immediate nn
 #define LD_rr_nn(reg_high, reg_low) \
-    reg_high = FETCH_16BIT_VAL(mmap, cpu->regPC) >> 8; \
-    reg_low = FETCH_16BIT_VAL(mmap, cpu->regPC) & 0xFF;
+    reg_high = FETCH_16BIT_VAL(memory_map, cpu->regPC) >> 8; \
+    reg_low = FETCH_16BIT_VAL(memory_map, cpu->regPC) & 0xFF;
 
 // regSP <- immediate nn
 #define LD_SP_nn \
-    cpu->regSP = FETCH_16BIT_VAL(mmap, cpu->regPC);
+    cpu->regSP = FETCH_16BIT_VAL(memory_map, cpu->regPC);
 
 // (address) <- register
 #define LD_addr_r(address, reg) \
-    STORE_8BIT_VAL(mmap, address, reg)
+    STORE_8BIT_VAL(memory_map, address, reg)
 
 // register <- (address)
 #define LD_r_addr(reg, address) \
-    reg = mmap[address]
+    reg = memory_map[address]
 
 // (address) <- register; increment register pair
 #define LDI_addr_r(reg_high, reg_low, src_reg) \
@@ -104,19 +104,19 @@ struct Cpu * init_cpu()
 #define JR_NZ_sn \
     if (TEST_BIT_IS_0(cpu->FLAG, 7)) \
     { \
-        cpu->regPC += FETCH_SIGNED_8BIT_VAL(mmap, cpu->regPC); \
+        cpu->regPC += FETCH_SIGNED_8BIT_VAL(memory_map, cpu->regPC); \
     }
 
 // jump if Z flag set
 #define JR_Z_sn \
     if (!TEST_BIT_IS_0(cpu->FLAG, 7)) \
     { \
-        cpu->regPC += FETCH_SIGNED_8BIT_VAL(mmap, cpu->regPC); \
+        cpu->regPC += FETCH_SIGNED_8BIT_VAL(memory_map, cpu->regPC); \
     }
 
 // jump
 #define JR_sn \
-    cpu->regPC += FETCH_SIGNED_8BIT_VAL(mmap, cpu->regPC);
+    cpu->regPC += FETCH_SIGNED_8BIT_VAL(memory_map, cpu->regPC);
 
 // xor reg with register A
 #define XOR_A(regA, reg) \
@@ -154,24 +154,24 @@ struct Cpu * init_cpu()
 
 #define CALL_nn \
     cpu->regSP--; \
-    STORE_16BIT_VAL(mmap, cpu->regSP, cpu->regPC+2); \
+    STORE_16BIT_VAL(memory_map, cpu->regSP, cpu->regPC+2); \
     cpu->regSP--; \
-    cpu->regPC = FETCH_16BIT_VAL(mmap, cpu->regPC);
+    cpu->regPC = FETCH_16BIT_VAL(memory_map, cpu->regPC);
 
 #define RET \
     cpu->regSP++; \
-    cpu->regPC = FETCH_16BIT_VAL(mmap, cpu->regSP); \
+    cpu->regPC = FETCH_16BIT_VAL(memory_map, cpu->regSP); \
     cpu->regSP++;
 
 #define PUSH_rr(reg_high, reg_low) \
     cpu->regSP--; \
-    STORE_16BIT_VAL(mmap, cpu->regSP, REG_PAIR_VAL(reg_high, reg_low)); \
+    STORE_16BIT_VAL(memory_map, cpu->regSP, REG_PAIR_VAL(reg_high, reg_low)); \
     cpu->regSP--;
 
 #define POP_rr(reg_high, reg_low) \
     cpu->regSP++; \
-    reg_high = FETCH_16BIT_VAL(mmap, cpu->regSP) >> 8; \
-    reg_low = FETCH_16BIT_VAL(mmap, cpu->regSP) & 0xFF; \
+    reg_high = FETCH_16BIT_VAL(memory_map, cpu->regSP) >> 8; \
+    reg_low = FETCH_16BIT_VAL(memory_map, cpu->regSP) & 0xFF; \
     cpu->regSP++;
 
 /*
@@ -180,9 +180,9 @@ struct Cpu * init_cpu()
     |  x  |    y   |    z   |
           |  p  | q|
 */
-void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
+void execute_instruction(uint8_t * memory_map, struct Cpu * cpu)
 {
-    uint8_t opcode = mmap[cpu->regPC++];
+    uint8_t opcode = memory_map[cpu->regPC++];
 
     switch (opcode)
     {
@@ -321,30 +321,30 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
             CALL_nn(cpu->regSP);
             break;
         case 0xE0:
-            LD_addr_r(0xFF00 + ((uint16_t) FETCH_8BIT_VAL(mmap, cpu->regPC)), cpu->regA);
+            LD_addr_r(0xFF00 + ((uint16_t) FETCH_8BIT_VAL(memory_map, cpu->regPC)), cpu->regA);
             cpu->regPC++;
             break;
         case 0xE2:
             LD_addr_r(0xFF00 + ((uint16_t) cpu->regC), cpu->regA);
             break;
         case 0xEA:
-            LD_addr_r(FETCH_16BIT_VAL(mmap, cpu->regPC), cpu->regA);
+            LD_addr_r(FETCH_16BIT_VAL(memory_map, cpu->regPC), cpu->regA);
             cpu->regPC++;
             cpu->regPC++;
             break;
         case 0xF0:
-            LD_r_addr(cpu->regA, 0xFF00 + ((uint16_t) FETCH_8BIT_VAL(mmap, cpu->regPC)));
+            LD_r_addr(cpu->regA, 0xFF00 + ((uint16_t) FETCH_8BIT_VAL(memory_map, cpu->regPC)));
             cpu->regPC++;
             break;
         case 0xF2:
             LD_r_addr(cpu->regA, 0xFF00 + ((uint16_t) cpu->regC));
             break;
         case 0xFE:
-            CP_A(FETCH_8BIT_VAL(mmap, cpu->regPC));
+            CP_A(FETCH_8BIT_VAL(memory_map, cpu->regPC));
             cpu->regPC++;
             break;
         case 0xCB:
-            opcode = mmap[cpu->regPC++];
+            opcode = memory_map[cpu->regPC++];
 
             switch(opcode)
             {
@@ -386,7 +386,7 @@ void execute_instruction(uint8_t * mmap, struct Cpu * cpu)
             break;
     }
 
-    debug_cpu(mmap, cpu);
+    debug_cpu(memory_map, cpu);
 }
 
 uint8_t * get_reg_by_num(struct Cpu * cpu, uint8_t reg_num)
@@ -421,7 +421,7 @@ uint8_t * get_reg_by_num(struct Cpu * cpu, uint8_t reg_num)
     }
 }
 
-void debug_cpu(uint8_t * mmap, struct Cpu * cpu)
+void debug_cpu(uint8_t * memory_map, struct Cpu * cpu)
 {
     printf("CPU state : \n \n");
     // register values
@@ -439,7 +439,7 @@ void debug_cpu(uint8_t * mmap, struct Cpu * cpu)
     printf("    sp = 0x%x \n", cpu->regSP);
     printf("    pc = 0x%x \n", cpu->regPC);
     // current instruction opcode
-    printf("    pc instruction: 0x%x \n", mmap[cpu->regPC]);
+    printf("    pc instruction: 0x%x \n", memory_map[cpu->regPC]);
 
     printf("\n");
 }
