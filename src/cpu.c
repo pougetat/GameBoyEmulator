@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "memory_map.h"
 #include "cpu.h"
@@ -122,13 +123,15 @@ void ldd_addr_r(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr, uint8_t reg_src, 
     dec_rr(reg_high_ptr, reg_low_ptr);
 }
 
-#define TEST_BIT_IS_0(reg, bit_num) \
-    ((reg >> bit_num) ^ 0x1)
+bool test_bit_is_0(uint8_t reg_ptr, uint8_t bit_num)
+{
+    return ((reg_ptr >> bit_num) ^ 0x1);
+}
 
 // jump if Z flag not set
 void jr_nz_sn(struct Cpu * cpu_ptr, uint8_t * memory_map)
 {
-    if (TEST_BIT_IS_0(cpu_ptr->FLAG, 7))
+    if (test_bit_is_0(cpu_ptr->FLAG, 7))
     {
         cpu_ptr->regPC += fetch_signed_8bit_val(memory_map, cpu_ptr->regPC); \
     }    
@@ -137,7 +140,7 @@ void jr_nz_sn(struct Cpu * cpu_ptr, uint8_t * memory_map)
 // jump if Z flag set
 void jr_z_sn(struct Cpu * cpu_ptr, uint8_t * memory_map)
 {
-    if (!TEST_BIT_IS_0(cpu_ptr->FLAG, 7))
+    if (!test_bit_is_0(cpu_ptr->FLAG, 7))
     {
         cpu_ptr->regPC += fetch_signed_8bit_val(memory_map, cpu_ptr->regPC);
     }    
@@ -183,7 +186,7 @@ void rl_r(uint8_t * reg_ptr, struct Cpu * cpu_ptr)
 // H <- set
 void bit(uint8_t bit_num, uint8_t reg, struct Cpu * cpu_ptr)
 {
-    SET_Z_FLAG(cpu_ptr, TEST_BIT_IS_0(reg, bit_num));
+    SET_Z_FLAG(cpu_ptr, test_bit_is_0(reg, bit_num));
     SET_N_FLAG(cpu_ptr, 0);
     SET_H_FLAG(cpu_ptr, 1);
 }
@@ -210,11 +213,13 @@ void push_rr(uint8_t reg_high, uint8_t reg_low, struct Cpu * cpu_ptr, uint8_t * 
     cpu_ptr->regSP--;
 }
 
-#define POP_rr(reg_high, reg_low) \
-    cpu_ptr->regSP++; \
-    reg_high = fetch_16bit_val(memory_map, cpu_ptr->regSP) >> 8; \
-    reg_low = fetch_16bit_val(memory_map, cpu_ptr->regSP) & 0xFF; \
+void pop_rr(uint8_t reg_high, uint8_t reg_low, struct Cpu * cpu_ptr, uint8_t * memory_map)
+{
     cpu_ptr->regSP++;
+    reg_high = fetch_16bit_val(memory_map, cpu_ptr->regSP) >> 8;
+    reg_low = fetch_16bit_val(memory_map, cpu_ptr->regSP) & 0xFF;
+    cpu_ptr->regSP++;
+}
 
 /*
     An 8 bit opcode can be broken down in the following way :
@@ -351,7 +356,7 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             xor_a(cpu_ptr->regA, cpu_ptr);
             break;
         case 0xC1:
-            POP_rr(cpu_ptr->regB, cpu_ptr->regC);
+            pop_rr(cpu_ptr->regB, cpu_ptr->regC, cpu_ptr, memory_map);
             break;
         case 0xC5:
             push_rr(cpu_ptr->regB, cpu_ptr->regC, cpu_ptr, memory_map);
