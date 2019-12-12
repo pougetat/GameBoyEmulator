@@ -38,6 +38,20 @@ void inc_rr(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr)
     }
 }
 
+// decrement register pair
+void dec_rr(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr)
+{
+    if (*reg_low_ptr == 0)
+    {
+        (*reg_high_ptr)--;
+        *reg_low_ptr = 0xFF;
+    }
+    else
+    {
+        (*reg_low_ptr)--;
+    }
+}
+
 // register_dest <- immediate n
 void ld_r_n(uint8_t * reg_ptr, struct Cpu * cpu_ptr, uint8_t * memory_map)
 {
@@ -84,9 +98,11 @@ void ldi_addr_r(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr, uint8_t reg_src, 
 }
 
 // (address) <- register; decrement register pair
-#define LDD_addr_r(reg_high, reg_low, src_reg) \
-    ld_addr_r(REG_PAIR_VAL(reg_high, reg_low), src_reg, memory_map); \
-    DEC_rr(reg_high, reg_low);
+void ldd_addr_r(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr, uint8_t reg_src, uint8_t * memory_map)
+{
+    ld_addr_r(REG_PAIR_VAL(*reg_high_ptr, *reg_low_ptr), reg_src, memory_map);
+    dec_rr(reg_high_ptr, reg_low_ptr);
+}
 
 // increment register
 #define INC_r(reg) \
@@ -94,18 +110,6 @@ void ldi_addr_r(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr, uint8_t reg_src, 
     reg++; \
     SET_Z_FLAG(cpu_ptr, (reg == 0)); \
     SET_N_FLAG(cpu_ptr, 0);
-
-// decrement register pair
-#define DEC_rr(reg_high, reg_low) \
-    if (reg_low == 0) \
-    { \
-        reg_high--; \
-        reg_low = 0xFF; \
-    } \
-    else \
-    { \
-        reg_low--; \
-    }
 
 // decrement register
 #define DEC_r(reg) \
@@ -289,7 +293,7 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             cpu_ptr->regPC = cpu_ptr->regPC + 2;
             break;
         case 0x32:
-            LDD_addr_r(cpu_ptr->regH, cpu_ptr->regL, cpu_ptr->regA);
+            ldd_addr_r(&(cpu_ptr->regH), &(cpu_ptr->regL), cpu_ptr->regA, memory_map);
             break;
         case 0x3D:
             DEC_r(cpu_ptr->regA);
