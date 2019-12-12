@@ -47,6 +47,15 @@ void inc_rr(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr)
     }
 }
 
+// decrement register
+void dec_r(uint8_t * reg_ptr, struct Cpu * cpu_ptr)
+{
+    SET_H_FLAG(cpu_ptr, !WILL_BORROW_FROM_4(*reg_ptr));
+    (*reg_ptr)--;
+    SET_Z_FLAG(cpu_ptr, (*reg_ptr == 0));
+    SET_N_FLAG(cpu_ptr, 1);
+}
+
 // decrement register pair
 void dec_rr(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr)
 {
@@ -112,13 +121,6 @@ void ldd_addr_r(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr, uint8_t reg_src, 
     ld_addr_r(REG_PAIR_VAL(*reg_high_ptr, *reg_low_ptr), reg_src, memory_map);
     dec_rr(reg_high_ptr, reg_low_ptr);
 }
-
-// decrement register
-#define DEC_r(reg) \
-    SET_H_FLAG(cpu_ptr, !WILL_BORROW_FROM_4(reg)); \
-    reg--; \
-    SET_Z_FLAG(cpu_ptr, (reg == 0)); \
-    SET_N_FLAG(cpu_ptr, 1);
 
 // jump if Z flag not set
 #define JR_NZ_sn \
@@ -223,7 +225,7 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             inc_r(&(cpu_ptr->regB), cpu_ptr);
             break;
         case 0x05:
-            DEC_r(cpu_ptr->regB);
+            dec_r(&(cpu_ptr->regB), cpu_ptr);
             break;
         case 0x06:
             ld_r_n(&(cpu_ptr->regB), cpu_ptr, memory_map);
@@ -233,7 +235,7 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             inc_r(&(cpu_ptr->regC), cpu_ptr);
             break;
         case 0x0D:
-            DEC_r(cpu_ptr->regC);
+            dec_r(&(cpu_ptr->regC), cpu_ptr);
             break;
         case 0x0E:
             ld_r_n(&(cpu_ptr->regC), cpu_ptr, memory_map);            
@@ -298,7 +300,7 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             ldd_addr_r(&(cpu_ptr->regH), &(cpu_ptr->regL), cpu_ptr->regA, memory_map);
             break;
         case 0x3D:
-            DEC_r(cpu_ptr->regA);
+            dec_r(&(cpu_ptr->regA), cpu_ptr);
             break;
         case 0x3E:
             ld_r_n(&(cpu_ptr->regA), cpu_ptr, memory_map);                        
