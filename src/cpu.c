@@ -24,6 +24,15 @@ struct Cpu * init_cpu()
 // NOP
 void nop(){}
 
+// increment register
+void inc_r(uint8_t * reg_ptr, struct Cpu * cpu_ptr)
+{
+    SET_H_FLAG(cpu_ptr, WILL_CARRY_3_TO_4(*reg_ptr));
+    (*reg_ptr)++;
+    SET_Z_FLAG(cpu_ptr, (*reg_ptr == 0));
+    SET_N_FLAG(cpu_ptr, 0);
+}
+
 // increment register pair
 void inc_rr(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr)
 {
@@ -103,13 +112,6 @@ void ldd_addr_r(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr, uint8_t reg_src, 
     ld_addr_r(REG_PAIR_VAL(*reg_high_ptr, *reg_low_ptr), reg_src, memory_map);
     dec_rr(reg_high_ptr, reg_low_ptr);
 }
-
-// increment register
-#define INC_r(reg) \
-    SET_H_FLAG(cpu_ptr, WILL_CARRY_3_TO_4(reg)); \
-    reg++; \
-    SET_Z_FLAG(cpu_ptr, (reg == 0)); \
-    SET_N_FLAG(cpu_ptr, 0);
 
 // decrement register
 #define DEC_r(reg) \
@@ -218,7 +220,7 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             inc_rr(&(cpu_ptr->regB), &(cpu_ptr->regC));
             break;
         case 0x04:
-            INC_r(cpu_ptr->regB);
+            inc_r(&(cpu_ptr->regB), cpu_ptr);
             break;
         case 0x05:
             DEC_r(cpu_ptr->regB);
@@ -228,7 +230,7 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             cpu_ptr->regPC++;
             break;
         case 0x0c:
-            INC_r(cpu_ptr->regC);
+            inc_r(&(cpu_ptr->regC), cpu_ptr);
             break;
         case 0x0D:
             DEC_r(cpu_ptr->regC);
