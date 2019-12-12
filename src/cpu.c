@@ -122,19 +122,26 @@ void ldd_addr_r(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr, uint8_t reg_src, 
     dec_rr(reg_high_ptr, reg_low_ptr);
 }
 
+#define TEST_BIT_IS_0(reg, bit_num) \
+    ((reg >> bit_num) ^ 0x1)
+
 // jump if Z flag not set
-#define JR_NZ_sn \
-    if (TEST_BIT_IS_0(cpu_ptr->FLAG, 7)) \
-    { \
+void jr_nz_sn(struct Cpu * cpu_ptr, uint8_t * memory_map)
+{
+    if (TEST_BIT_IS_0(cpu_ptr->FLAG, 7))
+    {
         cpu_ptr->regPC += fetch_signed_8bit_val(memory_map, cpu_ptr->regPC); \
-    }
+    }    
+}
 
 // jump if Z flag set
-#define JR_Z_sn \
-    if (!TEST_BIT_IS_0(cpu_ptr->FLAG, 7)) \
-    { \
-        cpu_ptr->regPC += fetch_signed_8bit_val(memory_map, cpu_ptr->regPC); \
-    }
+void jr_z_sn(struct Cpu * cpu_ptr, uint8_t * memory_map)
+{
+    if (!TEST_BIT_IS_0(cpu_ptr->FLAG, 7))
+    {
+        cpu_ptr->regPC += fetch_signed_8bit_val(memory_map, cpu_ptr->regPC);
+    }    
+}
 
 // jump
 #define JR_sn \
@@ -170,9 +177,6 @@ void ldd_addr_r(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr, uint8_t reg_src, 
     SET_Z_FLAG(cpu_ptr, TEST_BIT_IS_0(reg, bit_num)); \
     SET_N_FLAG(cpu_ptr, 0); \
     SET_H_FLAG(cpu_ptr, 1);
-
-#define TEST_BIT_IS_0(reg, bit_num) \
-    ((reg >> bit_num) ^ 0x1)
 
 #define CALL_nn \
     cpu_ptr->regSP--; \
@@ -267,7 +271,7 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             cpu_ptr->regPC++;
             break;
         case 0x20:
-            JR_NZ_sn;
+            jr_nz_sn(cpu_ptr, memory_map);
             cpu_ptr->regPC++;
             break;
         case 0x21:
@@ -285,7 +289,7 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             cpu_ptr->regPC++;
             break;
         case 0x28:
-            JR_Z_sn;
+            jr_z_sn(cpu_ptr, memory_map);
             cpu_ptr->regPC++;
             break;
         case 0x2E:
