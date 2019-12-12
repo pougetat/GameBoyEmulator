@@ -188,26 +188,27 @@ void bit(uint8_t bit_num, uint8_t reg, struct Cpu * cpu_ptr)
     SET_H_FLAG(cpu_ptr, 1);
 }
 
-#define BIT(bit_num, reg) \
-    SET_Z_FLAG(cpu_ptr, TEST_BIT_IS_0(reg, bit_num)); \
-    SET_N_FLAG(cpu_ptr, 0); \
-    SET_H_FLAG(cpu_ptr, 1);
-
-#define CALL_nn \
-    cpu_ptr->regSP--; \
-    store_16bit_val(memory_map, cpu_ptr->regSP, cpu_ptr->regPC+2); \
-    cpu_ptr->regSP--; \
-    cpu_ptr->regPC = fetch_16bit_val(memory_map, cpu_ptr->regPC);
-
-#define RET \
-    cpu_ptr->regSP++; \
-    cpu_ptr->regPC = fetch_16bit_val(memory_map, cpu_ptr->regSP); \
-    cpu_ptr->regSP++;
-
-#define PUSH_rr(reg_high, reg_low) \
-    cpu_ptr->regSP--; \
-    store_16bit_val(memory_map, cpu_ptr->regSP, REG_PAIR_VAL(reg_high, reg_low)); \
+void call_nn(struct Cpu * cpu_ptr, uint8_t * memory_map)
+{
     cpu_ptr->regSP--;
+    store_16bit_val(memory_map, cpu_ptr->regSP, cpu_ptr->regPC+2);
+    cpu_ptr->regSP--;
+    cpu_ptr->regPC = fetch_16bit_val(memory_map, cpu_ptr->regPC);
+}
+
+void ret(struct Cpu * cpu_ptr, uint8_t * memory_map)
+{
+    cpu_ptr->regSP++;
+    cpu_ptr->regPC = fetch_16bit_val(memory_map, cpu_ptr->regSP);
+    cpu_ptr->regSP++;
+}
+
+void push_rr(uint8_t reg_high, uint8_t reg_low, struct Cpu * cpu_ptr, uint8_t * memory_map)
+{
+    cpu_ptr->regSP--;
+    store_16bit_val(memory_map, cpu_ptr->regSP, REG_PAIR_VAL(reg_high, reg_low));
+    cpu_ptr->regSP--;
+}
 
 #define POP_rr(reg_high, reg_low) \
     cpu_ptr->regSP++; \
@@ -353,13 +354,13 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             POP_rr(cpu_ptr->regB, cpu_ptr->regC);
             break;
         case 0xC5:
-            PUSH_rr(cpu_ptr->regB, cpu_ptr->regC);
+            push_rr(cpu_ptr->regB, cpu_ptr->regC, cpu_ptr, memory_map);
             break;
         case 0xC9:
-            RET;
+            ret(cpu_ptr, memory_map);
             break;
         case 0xCD:
-            CALL_nn(cpu_ptr->regSP);
+            call_nn(cpu_ptr, memory_map);
             break;
         case 0xE0:
             ld_addr_r(0xFF00 + ((uint16_t) fetch_8bit_val(memory_map, cpu_ptr->regPC)), cpu_ptr->regA, memory_map);
