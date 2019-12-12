@@ -144,16 +144,20 @@ void jr_z_sn(struct Cpu * cpu_ptr, uint8_t * memory_map)
 }
 
 // jump
-#define JR_sn \
+void jr_sn(struct Cpu * cpu_ptr, uint8_t * memory_map)
+{
     cpu_ptr->regPC += fetch_signed_8bit_val(memory_map, cpu_ptr->regPC);
+}
 
 // xor reg with register A
-#define XOR_A(regA, reg) \
-    regA = regA ^ reg; \
-    SET_Z_FLAG(cpu_ptr, (regA == 0)); \
+void xor_a(uint8_t reg, struct Cpu * cpu_ptr)
+{
+    cpu_ptr->regA ^= reg;
+    SET_Z_FLAG(cpu_ptr, (cpu_ptr->regA == 0)); \
     SET_N_FLAG(cpu_ptr, 0); \
     SET_H_FLAG(cpu_ptr, 0); \
     SET_C_FLAG(cpu_ptr, 0); \
+}
 
 // compare register A with value
 #define CP_A(value) \
@@ -260,7 +264,7 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             RL_r(&(cpu_ptr->regA));
             break;
         case 0x18:
-            JR_sn;
+            jr_sn(cpu_ptr, memory_map);
             cpu_ptr->regPC++;
             break;
         case 0x1A:
@@ -326,13 +330,13 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             ld_r_r(&(cpu_ptr->regA), *get_reg_by_num(cpu_ptr, opcode & 0b111));
             break;
         case 0xA8 ... 0xAD: 
-            XOR_A(cpu_ptr->regA, *get_reg_by_num(cpu_ptr, opcode & 0xF));
+            xor_a(*get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
             break;
         case 0xAE:
-            XOR_A(cpu_ptr->regA, REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL));
+            xor_a(REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL), cpu_ptr);
             break;
         case 0xAF:
-            XOR_A(cpu_ptr->regA, cpu_ptr->regA);
+            xor_a(cpu_ptr->regA, cpu_ptr);
             break;
         case 0xC1:
             POP_rr(cpu_ptr->regB, cpu_ptr->regC);
