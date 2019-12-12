@@ -57,8 +57,10 @@ void ld_addr_r(memory_addr address, uint8_t reg, uint8_t * memory_map)
 }
 
 // register <- (address)
-#define LD_r_addr(reg, address) \
-    reg = memory_map[address]
+void ld_r_addr(uint8_t * reg_ptr, memory_addr address, uint8_t * memory_map)
+{
+    *reg_ptr = memory_map[address];
+}
 
 // (address) <- register; increment register pair
 #define LDI_addr_r(reg_high, reg_low, src_reg) \
@@ -246,7 +248,7 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             cpu_ptr->regPC++;
             break;
         case 0x1A:
-            LD_r_addr(cpu_ptr->regA, REG_PAIR_VAL(cpu_ptr->regD, cpu_ptr->regE));
+            ld_r_addr(&(cpu_ptr->regA), REG_PAIR_VAL(cpu_ptr->regD, cpu_ptr->regE), memory_map);
             break;
         case 0x1E:
             ld_r_n(&(cpu_ptr->regE), cpu_ptr, memory_map);            
@@ -341,11 +343,11 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             cpu_ptr->regPC++;
             break;
         case 0xF0:
-            LD_r_addr(cpu_ptr->regA, 0xFF00 + ((uint16_t) fetch_8bit_val(memory_map, cpu_ptr->regPC)));
+            ld_r_addr(&(cpu_ptr->regA), 0xFF00 + ((uint16_t) fetch_8bit_val(memory_map, cpu_ptr->regPC)), memory_map);
             cpu_ptr->regPC++;
             break;
         case 0xF2:
-            LD_r_addr(cpu_ptr->regA, 0xFF00 + ((uint16_t) cpu_ptr->regC));
+            ld_r_addr(&(cpu_ptr->regA), 0xFF00 + ((uint16_t) cpu_ptr->regC), memory_map);
             break;
         case 0xFE:
             CP_A(fetch_8bit_val(memory_map, cpu_ptr->regPC));
