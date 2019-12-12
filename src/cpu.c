@@ -31,13 +31,17 @@ void ld_r_n(uint8_t * reg_ptr, struct Cpu * cpu_ptr, uint8_t * memory_map)
 }
 
 // register_dest <- register_src
-#define LD_r_r(reg_dest, reg_src) \
-    reg_dest = reg_src; \
+void ld_r_r(uint8_t * reg_dest_ptr, uint8_t reg_src)
+{
+    *reg_dest_ptr = reg_src;
+}
 
 // register pair <- immediate nn
-#define LD_rr_nn(reg_high, reg_low) \
-    reg_high = fetch_16bit_val(memory_map, cpu_ptr->regPC) >> 8; \
-    reg_low = fetch_16bit_val(memory_map, cpu_ptr->regPC) & 0xFF;
+void ld_rr_nn(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr, struct Cpu * cpu_ptr, uint8_t * memory_map)
+{
+    *reg_high_ptr = fetch_16bit_val(memory_map, cpu_ptr->regPC) >> 8; \
+    *reg_low_ptr = fetch_16bit_val(memory_map, cpu_ptr->regPC) & 0xFF;
+}
 
 // regSP <- immediate nn
 #define LD_SP_nn \
@@ -190,7 +194,7 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             nop();
             break;
         case 0x01:
-            LD_rr_nn(cpu_ptr->regB, cpu_ptr->regC);
+            ld_rr_nn(&(cpu_ptr->regB), &(cpu_ptr->regC), cpu_ptr, memory_map);
             cpu_ptr->regPC = cpu_ptr->regPC + 2;
             break;
         case 0x02:
@@ -220,7 +224,7 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             cpu_ptr->regPC++;
             break;
         case 0x11:
-            LD_rr_nn(cpu_ptr->regD, cpu_ptr->regE);
+            ld_rr_nn(&(cpu_ptr->regD), &(cpu_ptr->regE), cpu_ptr, memory_map);
             cpu_ptr->regPC = cpu_ptr->regPC + 2;
             break;
         case 0x13:
@@ -249,7 +253,7 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             cpu_ptr->regPC++;
             break;
         case 0x21:
-            LD_rr_nn(cpu_ptr->regH, cpu_ptr->regL);
+            ld_rr_nn(&(cpu_ptr->regH), &(cpu_ptr->regL), cpu_ptr, memory_map);
             cpu_ptr->regPC = cpu_ptr->regPC + 2;
             break;
         case 0x22:
@@ -285,19 +289,19 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             cpu_ptr->regPC++;
             break;
         case 0x4F: // ld c a
-            LD_r_r(cpu_ptr->regC, cpu_ptr->regA);
+            ld_r_r(&(cpu_ptr->regC), cpu_ptr->regA);
             break;
         case 0x57:
-            LD_r_r(cpu_ptr->regD, cpu_ptr->regA);
+            ld_r_r(&(cpu_ptr->regD), cpu_ptr->regA);
             break;
         case 0x67:
-            LD_r_r(cpu_ptr->regH, cpu_ptr->regA);
+            ld_r_r(&(cpu_ptr->regH), cpu_ptr->regA);
             break;
         case 0x77:
             LD_addr_r(REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL), cpu_ptr->regA);
             break;
         case 0x78 ... 0x7D:
-            LD_r_r(cpu_ptr->regA, *get_reg_by_num(cpu_ptr, opcode & 0b111));
+            ld_r_r(&(cpu_ptr->regA), *get_reg_by_num(cpu_ptr, opcode & 0b111));
             break;
         case 0xA8 ... 0xAD: 
             XOR_A(cpu_ptr->regA, *get_reg_by_num(cpu_ptr, opcode & 0xF));
