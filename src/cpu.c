@@ -160,23 +160,34 @@ void xor_a(uint8_t reg, struct Cpu * cpu_ptr)
 }
 
 // compare register A with value
-#define CP_A(value) \
+void cp_a(uint8_t value, struct Cpu * cpu_ptr)
+{
     SET_Z_FLAG(cpu_ptr, (cpu_ptr->regA == value)); \
     SET_N_FLAG(cpu_ptr, 1); \
     SET_H_FLAG(cpu_ptr, (int) (cpu_ptr->regA & 0xf) < (int) (value & 0xf)); \
     SET_C_FLAG(cpu_ptr, (int) cpu_ptr->regA < (int) value);
+}
 
 // rotate register left
-#define RL_r(reg_ptr) \
-    SET_Z_FLAG(cpu_ptr, (*reg_ptr << 1 == 0)); \
-    SET_N_FLAG(cpu_ptr, 0); \
-    SET_H_FLAG(cpu_ptr, 0); \
-    SET_C_FLAG(cpu_ptr, *reg_ptr >> 7 & 0x1); \
-    *reg_ptr = *reg_ptr << 1; \
+void rl_r(uint8_t * reg_ptr, struct Cpu * cpu_ptr)
+{
+    SET_Z_FLAG(cpu_ptr, (*reg_ptr << 1 == 0));
+    SET_N_FLAG(cpu_ptr, 0);
+    SET_H_FLAG(cpu_ptr, 0);
+    SET_C_FLAG(cpu_ptr, *reg_ptr >> 7 & 0x1);
+    *reg_ptr = *reg_ptr << 1; 
+}
 
 // Z <- TEST_BIT_IS_0(bit_num, register)
 // N <- reset
 // H <- set
+void bit(uint8_t bit_num, uint8_t reg, struct Cpu * cpu_ptr)
+{
+    SET_Z_FLAG(cpu_ptr, TEST_BIT_IS_0(reg, bit_num));
+    SET_N_FLAG(cpu_ptr, 0);
+    SET_H_FLAG(cpu_ptr, 1);
+}
+
 #define BIT(bit_num, reg) \
     SET_Z_FLAG(cpu_ptr, TEST_BIT_IS_0(reg, bit_num)); \
     SET_N_FLAG(cpu_ptr, 0); \
@@ -261,7 +272,7 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             cpu_ptr->regPC++;
             break;
         case 0x17:
-            RL_r(&(cpu_ptr->regA));
+            rl_r(&(cpu_ptr->regA), cpu_ptr);
             break;
         case 0x18:
             jr_sn(cpu_ptr, memory_map);
@@ -370,7 +381,7 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             ld_r_addr(&(cpu_ptr->regA), 0xFF00 + ((uint16_t) cpu_ptr->regC), memory_map);
             break;
         case 0xFE:
-            CP_A(fetch_8bit_val(memory_map, cpu_ptr->regPC));
+            cp_a(fetch_8bit_val(memory_map, cpu_ptr->regPC), cpu_ptr);
             cpu_ptr->regPC++;
             break;
         case 0xCB:
@@ -379,31 +390,31 @@ void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
             switch(opcode)
             {
                 case 0x10 ... 0x15:
-                    RL_r(get_reg_by_num(cpu_ptr, opcode & 0xF));
+                    rl_r(get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
                     break;
                 case 0x40 ... 0x45:
-                    BIT(0, *get_reg_by_num(cpu_ptr, opcode & 0xF));
+                    bit(0, *get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
                     break;
                 case 0x48 ... 0x4D:
-                    BIT(1, *get_reg_by_num(cpu_ptr, opcode & 0b111));
+                    bit(1, *get_reg_by_num(cpu_ptr, opcode & 0b111), cpu_ptr);
                     break;
                 case 0x50 ... 0x55:
-                    BIT(2, *get_reg_by_num(cpu_ptr, opcode & 0xF));
+                    bit(2, *get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
                     break;
                 case 0x58 ... 0x5D:
-                    BIT(3, *get_reg_by_num(cpu_ptr, opcode & 0b111));
+                    bit(3, *get_reg_by_num(cpu_ptr, opcode & 0b111), cpu_ptr);
                     break;
                 case 0x60 ... 0x65:
-                    BIT(4, *get_reg_by_num(cpu_ptr, opcode & 0xF));
+                    bit(4, *get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
                     break;
                 case 0x68 ... 0x6D:
-                    BIT(5, *get_reg_by_num(cpu_ptr, opcode & 0b111));
+                    bit(5, *get_reg_by_num(cpu_ptr, opcode & 0b111), cpu_ptr);
                     break;
                 case 0x70 ... 0x75:
-                    BIT(6, *get_reg_by_num(cpu_ptr, opcode & 0xF));
+                    bit(6, *get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
                     break;
                 case 0x78 ... 0x7D:
-                    BIT(7, *get_reg_by_num(cpu_ptr, opcode & 0b111));
+                    bit(7, *get_reg_by_num(cpu_ptr, opcode & 0b111), cpu_ptr);
                     break;
                 default:
                     printf("%i", 0/0);
