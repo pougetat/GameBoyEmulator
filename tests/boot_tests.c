@@ -9,6 +9,8 @@
 #define SETUP_VRAM_START_ADDRESS 0x3
 #define SETUP_AUDIO_START_ADDRESS 0xc
 #define SETUP_BG_PALETTE_START_ADDRESS 0x1d
+#define CONVERT_AND_LOAD_LOGO_DATA_TO_VRAM 0x21
+#define LOAD_ADDITIONAL_BYTES_TO_VRAM 0x34
 
 // These variables describe the memory layout
 #define VRAM_START_ADDRESS 0x8000
@@ -36,6 +38,11 @@ void check_audio_setup(uint8_t * memory_map)
     assert(memory_map[0xFF26] == 0x80);   
 }
 
+void check_background_palette_setup(uint8_t * memory_map)
+{
+    assert(memory_map[0xFF47] == 0xFC);
+}
+
 int main(void)
 {
     FILE * rom_file = fopen("../testRoms/simple.gb", "r");
@@ -60,6 +67,17 @@ int main(void)
         execute_instruction(memory_map, cpu_ptr);
     }
     check_audio_setup(memory_map);
+
+    while (cpu_ptr->regPC != CONVERT_AND_LOAD_LOGO_DATA_TO_VRAM)
+    {
+        execute_instruction(memory_map, cpu_ptr);
+    }
+    check_background_palette_setup(memory_map);
+
+    while (cpu_ptr->regPC != LOAD_ADDITIONAL_BYTES_TO_VRAM)
+    {
+        execute_instruction(memory_map, cpu_ptr);
+    }
 
     return 0;
 }

@@ -44,7 +44,7 @@ void inc_rr(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr)
     }
     else
     {
-        *(reg_low_ptr)++;
+        (*reg_low_ptr)++;
     }
 }
 
