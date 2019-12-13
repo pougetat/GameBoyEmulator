@@ -11,7 +11,7 @@ int main(void)
     uint8_t * memory_map = init_memory_map(rom_file);
     struct Cpu * cpu = init_cpu();
 
-    while (cpu->regPC != 0x2e)
+    while (cpu->regPC != 0x70) // CURRENTLY INFINITE LOOP (not at 0x64)
     {
         execute_instruction(memory_map, cpu);
     }
