@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "memory_map.h"
+#include "mmu.h"
 #include "cpu.h"
 
 struct Cpu * init_cpu()

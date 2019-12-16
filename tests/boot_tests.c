@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <assert.h>
-#include "../src/memory_map.h"
+#include "../src/mmu.h"
 #include "../src/cpu.h"
 
 // These variables describe important boot rom instruction addresses

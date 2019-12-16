@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include "memory_map.h"
+#include "mmu.h"
 #include "cpu.h"
 
 int main(void)
