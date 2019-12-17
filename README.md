@@ -63,6 +63,7 @@ http://bgb.bircd.org/pandocs.htm
 https://gbdev.gg8.se/wiki/articles/Pan_Docs#Cartridges
 http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
 https://github.com/gbdev/awesome-gbdev
+http://www.emulatronia.com/doctec/consolas/gameboy/gameboy.txt
 
 https://realboyemulator.wordpress.com/2013/01/03/a-look-at-the-game-boy-bootstrap-let-the-fun-begin/ => great explanation of the boot process
 
