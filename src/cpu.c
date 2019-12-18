@@ -1,10 +1,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "mmu.h"
 #include "cpu.h"
+#include "mmu.h"
 
-struct Cpu * init_cpu()
+struct Cpu * cpu_init()
 {
     struct Cpu * cpu_ptr = malloc(sizeof(struct Cpu));
 
@@ -227,8 +227,11 @@ void pop_rr(uint8_t reg_high, uint8_t reg_low, struct Cpu * cpu_ptr, uint8_t * m
     |  x  |    y   |    z   |
           |  p  | q|
 */
-void execute_instruction(uint8_t * memory_map, struct Cpu * cpu_ptr)
+void cpu_step(GameBoy * gameboy_ptr)
 {
+    Cpu * cpu_ptr = gameboy_ptr->cpu_ptr;
+    uint8_t * memory_map = gameboy_ptr->mmu_ptr->memory_map;
+
     uint8_t opcode = memory_map[cpu_ptr->regPC++];
 
     switch (opcode)

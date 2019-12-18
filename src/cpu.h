@@ -2,8 +2,9 @@
 #define CPU_H
 
 #include <stdint.h>
+#include "gameboy.h"
 
-struct Cpu {
+typedef struct Cpu {
     uint8_t regB;
     uint8_t regC;
     uint8_t regD;
@@ -14,7 +15,7 @@ struct Cpu {
     uint16_t regSP;
     uint16_t regPC;
     uint16_t FLAG;
-};
+} Cpu;
 
 #define REG_PAIR_VAL(reg_high, reg_low) \
     (((uint16_t) reg_high << 8) | reg_low)
@@ -47,9 +48,8 @@ struct Cpu {
 #define WILL_BORROW_FROM_4(reg) \
     (reg & 0b1111 == 0b1000)
 
-struct Cpu * init_cpu();
-
-void execute_instruction(uint8_t * memory_map, struct Cpu * cpu);
+Cpu * cpu_init();
+void cpu_step(GameBoy * gameboy_ptr);
 uint8_t * get_reg_by_num(struct Cpu * cpu, uint8_t reg_num);
 void debug_cpu(uint8_t * memory_map, struct Cpu * cpu);
 

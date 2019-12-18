@@ -1,9 +1,14 @@
+#ifndef PPU_H
+#define PPU_H
+
 #include <stdint.h>
 
-#include "mmu.h"
+typedef struct GameBoy GameBoy;
 
-struct PPU {
+typedef struct Ppu {
     uint32_t * ppu_clock;
-}
+} Ppu;
 
-void ppu_step(struct PPU * ppu, uint8_t * memory_map);
+void ppu_step(GameBoy * gameboy_ptr);
+
+#endif

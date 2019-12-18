@@ -2,27 +2,39 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "stdio.h"
+
 #define MEMORY_MAP_SIZE 65536 // 0x0000 - 0xFFFF
 #define MAX_ROM_SIZE 16384 // 0x0000 - 0x3FFF (only handling 32 KB roms for now)
 
-uint8_t * init_memory_map(FILE * rom_file)
-{    
-    uint8_t * memory_map = malloc(MEMORY_MAP_SIZE);
+Mmu * mmu_init()
+{
+    Mmu * mmu = malloc(sizeof(Mmu));
+    mmu->memory_map = malloc(MEMORY_MAP_SIZE);
 
+    return mmu;
+}
+
+void mmu_read_rom(struct Mmu * mmu, FILE * rom_file)
+{
+    printf("Hello \n");
+    fflush(stdout);
+    printf("Hello \n");
+    printf("Hello \n");
+    printf("Hello \n");
+    printf("Hello \n");
     int byte;
     uint16_t cur_pos = 0;
     while ((byte = fgetc(rom_file)) != EOF & cur_pos < MAX_ROM_SIZE)
     {
-        memory_map[cur_pos++] = (uint8_t) byte;
+        mmu->memory_map[cur_pos++] = (uint8_t) byte;
     }
     fclose(rom_file);
 
     for (int i = 0; i < 256; i++) {
-        printf("%i : %x \n", i, memory_map[i]);
+        printf("%i : %x \n", i, mmu->memory_map[i]);
     }
     printf("\n");
-
-    return memory_map;
 }
 
 // GB is little endian so we handle the conversion here

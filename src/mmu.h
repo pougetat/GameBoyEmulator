@@ -1,9 +1,15 @@
+#ifndef MMU_H
+#define MMU_H
+
 #include <stdio.h>
 #include <stdint.h>
 
-uint8_t * init_memory_map(FILE * rom_file);
-
+typedef struct GameBoy GameBoy;
 typedef uint16_t memory_addr;
+
+typedef struct Mmu {
+    uint8_t * memory_map;
+} Mmu;
 
 // memory mapped register address
 
@@ -17,8 +23,13 @@ typedef uint16_t memory_addr;
 #define LYC_R_ADDR 0xFF45  // LY Compare (R/W)
 #define BGP_R_ADDR 0xFF47  // BG Palette Data (W)
 
+Mmu * mmu_init();
+void mmu_step(GameBoy * gameboy_ptr);
+
 uint16_t fetch_16bit_val(uint8_t * memory_map, memory_addr address);
 uint8_t fetch_8bit_val(uint8_t * memory_map, memory_addr address);
 int8_t fetch_signed_8bit_val(uint8_t * memory_map, memory_addr address);
 void store_16bit_val(uint8_t * memory_map, memory_addr address, uint16_t value);
 void store_8bit_val(uint8_t * memory_map, memory_addr address, uint8_t value);
+
+#endif
