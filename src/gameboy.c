@@ -29,3 +29,8 @@ void gameboy_run(GameBoy * gameboy_ptr)
         //ppu_step(gameboy_ptr);
     }
 }
+
+uint8_t gameboy_prev_executed_cycles(GameBoy * gameboy_ptr)
+{
+    return gameboy_ptr->cpu_ptr->prev_instruction_cycles;
+}

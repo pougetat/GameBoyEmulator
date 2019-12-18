@@ -15,6 +15,8 @@ typedef struct Cpu {
     uint16_t regSP;
     uint16_t regPC;
     uint16_t FLAG;
+
+    uint8_t prev_instruction_cycles;
 } Cpu;
 
 #define REG_PAIR_VAL(reg_high, reg_low) \
