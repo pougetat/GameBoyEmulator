@@ -17,12 +17,6 @@ Mmu * mmu_init()
 
 void mmu_read_rom(struct Mmu * mmu, FILE * rom_file)
 {
-    printf("Hello \n");
-    fflush(stdout);
-    printf("Hello \n");
-    printf("Hello \n");
-    printf("Hello \n");
-    printf("Hello \n");
     int byte;
     uint16_t cur_pos = 0;
     while ((byte = fgetc(rom_file)) != EOF & cur_pos < MAX_ROM_SIZE)

@@ -11,6 +11,7 @@ GameBoy * gameboy_init()
     
     gameboy_ptr->cpu_ptr = cpu_init();
     gameboy_ptr->mmu_ptr = mmu_init();
+    gameboy_ptr->ppu_ptr = ppu_init();
     gameboy_ptr->gameboy_clock = 0;
 
     return gameboy_ptr;
@@ -26,7 +27,7 @@ void gameboy_run(GameBoy * gameboy_ptr)
     while (gameboy_ptr->cpu_ptr->regPC != 0x95)
     {
         cpu_step(gameboy_ptr);
-        //ppu_step(gameboy_ptr);
+        ppu_step(gameboy_ptr);
     }
 }
 

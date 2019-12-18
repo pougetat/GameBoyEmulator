@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "ppu.h"
 #include "gameboy.h"
 
@@ -15,6 +17,16 @@
 
 void ppu_render_scanline(GameBoy * gameboy_ptr);
 void ppu_synchronize_clocks(GameBoy * gameboy_ptr, Ppu * ppu_ptr);
+
+Ppu * ppu_init()
+{
+    Ppu * ppu_ptr = malloc(sizeof(Ppu));
+    ppu_ptr->ppu_cur_mode = 0;
+    ppu_ptr->ppu_cur_mode_clock = 0;
+    ppu_ptr->ppu_cur_frame_clock = 0;
+
+    return ppu_ptr;
+}
 
 void ppu_step(GameBoy * gameboy_ptr)
 {
@@ -58,7 +70,7 @@ void ppu_render_scanline(GameBoy * gameboy_ptr){}
 
 void ppu_synchronize_clocks(GameBoy * gameboy_ptr, Ppu * ppu_ptr)
 {
-    uint32_t cycles = gameboy_prev_executed_cycles(gameboy_ptr);
+    uint8_t cycles = gameboy_prev_executed_cycles(gameboy_ptr);
 
     ppu_ptr->ppu_cur_mode_clock += cycles;
     ppu_ptr->ppu_cur_frame_clock += cycles;
