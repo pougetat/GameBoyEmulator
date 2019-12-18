@@ -26,6 +26,6 @@ void gameboy_run(GameBoy * gameboy_ptr)
     while (gameboy_ptr->cpu_ptr->regPC != 0x95)
     {
         cpu_step(gameboy_ptr);
-        ppu_step(gameboy_ptr);
+        //ppu_step(gameboy_ptr);
     }
 }
