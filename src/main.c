@@ -6,7 +6,6 @@
 
 int main(void)
 {
-    printf("Hello \n");
     GameBoy * gameboy_ptr = gameboy_init();
     FILE * rom_file = fopen("../testRoms/simple.gb", "r"); 
     gameboy_read_rom(gameboy_ptr, rom_file);

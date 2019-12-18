@@ -2,8 +2,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <assert.h>
+#include "../src/gameboy.h"
 #include "../src/mmu.h"
 #include "../src/cpu.h"
+#include "../src/ppu.h"
 
 // These variables describe important boot rom instruction addresses
 #define SETUP_VRAM_START_ADDRESS 0x3
@@ -45,38 +47,41 @@ void check_background_palette_setup(uint8_t * memory_map)
 
 int main(void)
 {
-    FILE * rom_file = fopen("../testRoms/simple.gb", "r");
+    GameBoy * gameboy_ptr = gameboy_init();
+    FILE * rom_file = fopen("../testRoms/simple.gb", "r"); 
+    gameboy_read_rom(gameboy_ptr, rom_file);
+    gameboy_run(gameboy_ptr);
 
-    uint8_t * memory_map = init_memory_map(rom_file);
-    struct Cpu * cpu_ptr = init_cpu();
+    Cpu * cpu_ptr = gameboy_ptr->cpu_ptr;
+    uint8_t * memory_map = gameboy_ptr->mmu_ptr->memory_map;
 
     while (cpu_ptr->regPC != SETUP_VRAM_START_ADDRESS)
     {
-        execute_instruction(memory_map, cpu_ptr);
+        cpu_step(gameboy_ptr);
     }
     check_stack_setup(cpu_ptr);
 
     while (cpu_ptr->regPC != SETUP_AUDIO_START_ADDRESS)
     {
-        execute_instruction(memory_map, cpu_ptr);
+        cpu_step(gameboy_ptr);
     }
     check_vram_setup(memory_map);
 
     while (cpu_ptr->regPC != SETUP_BG_PALETTE_START_ADDRESS)
     {
-        execute_instruction(memory_map, cpu_ptr);
+        cpu_step(gameboy_ptr);
     }
     check_audio_setup(memory_map);
 
     while (cpu_ptr->regPC != CONVERT_AND_LOAD_LOGO_DATA_TO_VRAM)
     {
-        execute_instruction(memory_map, cpu_ptr);
+        cpu_step(gameboy_ptr);
     }
     check_background_palette_setup(memory_map);
 
     while (cpu_ptr->regPC != LOAD_ADDITIONAL_BYTES_TO_VRAM)
     {
-        execute_instruction(memory_map, cpu_ptr);
+        cpu_step(gameboy_ptr);
     }
 
     return 0;
