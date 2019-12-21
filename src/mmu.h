@@ -15,13 +15,13 @@ typedef struct Mmu {
 
     // LCD related registers
 
-#define LCDC_R_ADDR 0xFF40 // LCD contol (R/W)
-#define STAT_R_ADDR 0xFF41 // LCDC status (R/W)
-#define SCY_R_ADDR 0xFF42  // Scroll Y (R/W)
-#define SCX_R_ADDR 0xFF43  // Scroll X (R/W)
-#define LY_R_ADDR 0xFF44   // LCDC Y-Coordinate (R)
-#define LYC_R_ADDR 0xFF45  // LY Compare (R/W)
-#define BGP_R_ADDR 0xFF47  // BG Palette Data (W)
+#define R_LCDC_ADDR 0xFF40 // LCD contol (R/W)
+#define R_STAT_ADDR 0xFF41 // LCDC status (R/W)
+#define R_SCY_ADDR 0xFF42  // Scroll Y (R/W)
+#define R_SCX_ADDR 0xFF43  // Scroll X (R/W)
+#define R_LY_ADDR 0xFF44   // LCDC Y-Coordinate (R)
+#define R_LYC_ADDR 0xFF45  // LY Compare (R/W)
+#define R_BGP_ADDR 0xFF47  // BG Palette Data (W)
 
 Mmu * mmu_init();
 void mmu_read_rom(struct Mmu * mmu, FILE * rom_file);
