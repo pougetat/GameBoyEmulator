@@ -77,15 +77,6 @@ More tasks will be added below as I move through the project and gain a better u
 			5 - Implement lcdc_win_enabled()
 			6 - Implement lcdc_win_tilemap_addr_mode()
 			7 - Implement lcdc_display_enabled()
-			
-			0 - Implement lcdc_set_bg_enabled()
-			1 - Implement lcdc_set_sprite_enabled()
-			2 - Implement lcdc_set_sprite_size_mode()
-			3 - Implement lcdc_set_bg_tilemap_addr_mode()
-			4 - Implement lcdc_set_bg_win_tilemap_addr_mode()
-			5 - Implement lcdc_set_win_enabled()
-			6 - Implement lcdc_set_win_tilemap_addr_mode()
-			7 - Implement lcdc_set_display_enabled()
 	
 	TASK : implement LCD STAT register => 0xFF41
 	
