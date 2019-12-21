@@ -30,6 +30,5 @@ void mmu_step(GameBoy * gameboy_ptr);
 uint16_t mmu_fetch_16bit_val(uint8_t * memory_map, memory_addr address);
 int8_t mmu_fetch_signed_8bit_val(uint8_t * memory_map, memory_addr address);
 void mmu_store_16bit_val(uint8_t * memory_map, memory_addr address, uint16_t value);
-void mmu_store_8bit_val(uint8_t * memory_map, memory_addr address, uint8_t value);
 
 #endif
