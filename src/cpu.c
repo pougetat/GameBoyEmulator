@@ -74,7 +74,7 @@ void dec_rr(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr)
 // register_dest <- immediate n
 void ld_r_n(uint8_t * reg_ptr, struct Cpu * cpu_ptr, uint8_t * memory_map)
 {
-    *reg_ptr = fetch_8bit_val(memory_map, cpu_ptr->regPC);
+    *reg_ptr = mmu_fetch_8bit_val(memory_map, cpu_ptr->regPC);
 }
 
 // register_dest <- register_src
@@ -86,21 +86,21 @@ void ld_r_r(uint8_t * reg_dest_ptr, uint8_t reg_src)
 // register pair <- immediate nn
 void ld_rr_nn(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr, struct Cpu * cpu_ptr, uint8_t * memory_map)
 {
-    *reg_high_ptr = fetch_16bit_val(memory_map, cpu_ptr->regPC) >> 8; \
-    *reg_low_ptr = fetch_16bit_val(memory_map, cpu_ptr->regPC) & 0xFF;
+    *reg_high_ptr = mmu_fetch_16bit_val(memory_map, cpu_ptr->regPC) >> 8; \
+    *reg_low_ptr = mmu_fetch_16bit_val(memory_map, cpu_ptr->regPC) & 0xFF;
 }
 
 // regSP <- immediate nn
 void ld_sp_nn(struct Cpu * cpu_ptr, uint8_t * memory_map)
 {
-    cpu_ptr->regSP = fetch_16bit_val(memory_map, cpu_ptr->regPC);
+    cpu_ptr->regSP = mmu_fetch_16bit_val(memory_map, cpu_ptr->regPC);
 }
 
 // (address) <- register
 void ld_addr_r(memory_addr address, uint8_t reg, uint8_t * memory_map)
 {
     memory_map[address] = 0x9;
-    store_8bit_val(memory_map, address, reg);
+    mmu_store_8bit_val(memory_map, address, reg);
 }
 
 // register <- (address)
@@ -133,7 +133,7 @@ void jr_nz_sn(struct Cpu * cpu_ptr, uint8_t * memory_map)
 {
     if (test_bit_is_0(cpu_ptr->FLAG, 7))
     {
-        cpu_ptr->regPC += fetch_signed_8bit_val(memory_map, cpu_ptr->regPC); \
+        cpu_ptr->regPC += mmu_fetch_signed_8bit_val(memory_map, cpu_ptr->regPC); \
     }    
 }
 
@@ -142,14 +142,14 @@ void jr_z_sn(struct Cpu * cpu_ptr, uint8_t * memory_map)
 {
     if (!test_bit_is_0(cpu_ptr->FLAG, 7))
     {
-        cpu_ptr->regPC += fetch_signed_8bit_val(memory_map, cpu_ptr->regPC);
+        cpu_ptr->regPC += mmu_fetch_signed_8bit_val(memory_map, cpu_ptr->regPC);
     }    
 }
 
 // jump
 void jr_sn(struct Cpu * cpu_ptr, uint8_t * memory_map)
 {
-    cpu_ptr->regPC += fetch_signed_8bit_val(memory_map, cpu_ptr->regPC);
+    cpu_ptr->regPC += mmu_fetch_signed_8bit_val(memory_map, cpu_ptr->regPC);
 }
 
 // xor reg with register A
@@ -194,30 +194,30 @@ void bit(uint8_t bit_num, uint8_t reg, struct Cpu * cpu_ptr)
 void call_nn(struct Cpu * cpu_ptr, uint8_t * memory_map)
 {
     cpu_ptr->regSP--;
-    store_16bit_val(memory_map, cpu_ptr->regSP, cpu_ptr->regPC+2);
+    mmu_store_16bit_val(memory_map, cpu_ptr->regSP, cpu_ptr->regPC+2);
     cpu_ptr->regSP--;
-    cpu_ptr->regPC = fetch_16bit_val(memory_map, cpu_ptr->regPC);
+    cpu_ptr->regPC = mmu_fetch_16bit_val(memory_map, cpu_ptr->regPC);
 }
 
 void ret(struct Cpu * cpu_ptr, uint8_t * memory_map)
 {
     cpu_ptr->regSP++;
-    cpu_ptr->regPC = fetch_16bit_val(memory_map, cpu_ptr->regSP);
+    cpu_ptr->regPC = mmu_fetch_16bit_val(memory_map, cpu_ptr->regSP);
     cpu_ptr->regSP++;
 }
 
 void push_rr(uint8_t reg_high, uint8_t reg_low, struct Cpu * cpu_ptr, uint8_t * memory_map)
 {
     cpu_ptr->regSP--;
-    store_16bit_val(memory_map, cpu_ptr->regSP, REG_PAIR_VAL(reg_high, reg_low));
+    mmu_store_16bit_val(memory_map, cpu_ptr->regSP, REG_PAIR_VAL(reg_high, reg_low));
     cpu_ptr->regSP--;
 }
 
 void pop_rr(uint8_t reg_high, uint8_t reg_low, struct Cpu * cpu_ptr, uint8_t * memory_map)
 {
     cpu_ptr->regSP++;
-    reg_high = fetch_16bit_val(memory_map, cpu_ptr->regSP) >> 8;
-    reg_low = fetch_16bit_val(memory_map, cpu_ptr->regSP) & 0xFF;
+    reg_high = mmu_fetch_16bit_val(memory_map, cpu_ptr->regSP) >> 8;
+    reg_low = mmu_fetch_16bit_val(memory_map, cpu_ptr->regSP) & 0xFF;
     cpu_ptr->regSP++;
 }
 
@@ -371,26 +371,26 @@ void cpu_step(GameBoy * gameboy_ptr)
             call_nn(cpu_ptr, memory_map);
             break;
         case 0xE0:
-            ld_addr_r(0xFF00 + ((uint16_t) fetch_8bit_val(memory_map, cpu_ptr->regPC)), cpu_ptr->regA, memory_map);
+            ld_addr_r(0xFF00 + ((uint16_t) mmu_fetch_8bit_val(memory_map, cpu_ptr->regPC)), cpu_ptr->regA, memory_map);
             cpu_ptr->regPC++;
             break;
         case 0xE2:
             ld_addr_r(0xFF00 + ((uint16_t) cpu_ptr->regC), cpu_ptr->regA, memory_map);
             break;
         case 0xEA:
-            ld_addr_r(fetch_16bit_val(memory_map, cpu_ptr->regPC), cpu_ptr->regA, memory_map);
+            ld_addr_r(mmu_fetch_16bit_val(memory_map, cpu_ptr->regPC), cpu_ptr->regA, memory_map);
             cpu_ptr->regPC++;
             cpu_ptr->regPC++;
             break;
         case 0xF0:
-            ld_r_addr(&(cpu_ptr->regA), 0xFF00 + ((uint16_t) fetch_8bit_val(memory_map, cpu_ptr->regPC)), memory_map);
+            ld_r_addr(&(cpu_ptr->regA), 0xFF00 + ((uint16_t) mmu_fetch_8bit_val(memory_map, cpu_ptr->regPC)), memory_map);
             cpu_ptr->regPC++;
             break;
         case 0xF2:
             ld_r_addr(&(cpu_ptr->regA), 0xFF00 + ((uint16_t) cpu_ptr->regC), memory_map);
             break;
         case 0xFE:
-            cp_a(fetch_8bit_val(memory_map, cpu_ptr->regPC), cpu_ptr);
+            cp_a(mmu_fetch_8bit_val(memory_map, cpu_ptr->regPC), cpu_ptr);
             cpu_ptr->regPC++;
             break;
         case 0xCB:

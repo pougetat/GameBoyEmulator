@@ -15,9 +15,6 @@
 
 #define PPU_FRAME_CYCLES 70224
 
-void render_scanline(GameBoy * gameboy_ptr);
-void synchronize_clocks(GameBoy * gameboy_ptr, Ppu * ppu_ptr);
-
 Ppu * ppu_init()
 {
     Ppu * ppu_ptr = malloc(sizeof(Ppu));

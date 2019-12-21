@@ -27,10 +27,10 @@ Mmu * mmu_init();
 void mmu_read_rom(struct Mmu * mmu, FILE * rom_file);
 void mmu_step(GameBoy * gameboy_ptr);
 
-uint16_t fetch_16bit_val(uint8_t * memory_map, memory_addr address);
-uint8_t fetch_8bit_val(uint8_t * memory_map, memory_addr address);
-int8_t fetch_signed_8bit_val(uint8_t * memory_map, memory_addr address);
-void store_16bit_val(uint8_t * memory_map, memory_addr address, uint16_t value);
-void store_8bit_val(uint8_t * memory_map, memory_addr address, uint8_t value);
+uint16_t mmu_fetch_16bit_val(uint8_t * memory_map, memory_addr address);
+uint8_t mmu_fetch_8bit_val(uint8_t * memory_map, memory_addr address);
+int8_t mmu_fetch_signed_8bit_val(uint8_t * memory_map, memory_addr address);
+void mmu_store_16bit_val(uint8_t * memory_map, memory_addr address, uint16_t value);
+void mmu_store_8bit_val(uint8_t * memory_map, memory_addr address, uint8_t value);
 
 #endif
