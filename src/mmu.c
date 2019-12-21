@@ -37,23 +37,13 @@ uint16_t mmu_fetch_16bit_val(uint8_t * memory_map, memory_addr address)
     return ((uint16_t) memory_map[address+1]) << 8 | memory_map[address];
 }
 
-uint8_t mmu_fetch_8bit_val(uint8_t * memory_map, memory_addr address)
-{
-    return memory_map[address];
-}
-
 int8_t mmu_fetch_signed_8bit_val(uint8_t * memory_map, memory_addr address)
 {
     return (int8_t) memory_map[address];
 }
 
-void mmu_store_8bit_val(uint8_t * memory_map, memory_addr address, uint8_t value)
-{
-    memory_map[address] = value;
-}
-
 void mmu_store_16bit_val(uint8_t * memory_map, memory_addr address, uint16_t value)
 {
-    mmu_store_8bit_val(memory_map, address, (uint8_t) (value & 0xFF));
-    mmu_store_8bit_val(memory_map, address+1, (uint8_t) (value >> 8));
+    memory_map[address] = (uint8_t) (value & 0xFF);
+    memory_map[address+1] = (uint8_t) (value >> 8);
 }

@@ -74,7 +74,7 @@ void dec_rr(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr)
 // register_dest <- immediate n
 void ld_r_n(uint8_t * reg_ptr, struct Cpu * cpu_ptr, uint8_t * memory_map)
 {
-    *reg_ptr = mmu_fetch_8bit_val(memory_map, cpu_ptr->regPC);
+    *reg_ptr = memory_map[cpu_ptr->regPC];
 }
 
 // register_dest <- register_src
@@ -99,8 +99,7 @@ void ld_sp_nn(struct Cpu * cpu_ptr, uint8_t * memory_map)
 // (address) <- register
 void ld_addr_r(memory_addr address, uint8_t reg, uint8_t * memory_map)
 {
-    memory_map[address] = 0x9;
-    mmu_store_8bit_val(memory_map, address, reg);
+    memory_map[address] = reg;
 }
 
 // register <- (address)
@@ -371,11 +370,11 @@ void cpu_step(GameBoy * gameboy_ptr)
             call_nn(cpu_ptr, memory_map);
             break;
         case 0xE0:
-            ld_addr_r(0xFF00 + ((uint16_t) mmu_fetch_8bit_val(memory_map, cpu_ptr->regPC)), cpu_ptr->regA, memory_map);
+            ld_addr_r(0xFF00 + (uint16_t) memory_map[cpu_ptr->regPC], cpu_ptr->regA, memory_map);
             cpu_ptr->regPC++;
             break;
         case 0xE2:
-            ld_addr_r(0xFF00 + ((uint16_t) cpu_ptr->regC), cpu_ptr->regA, memory_map);
+            ld_addr_r(0xFF00 + (uint16_t) cpu_ptr->regC, cpu_ptr->regA, memory_map);
             break;
         case 0xEA:
             ld_addr_r(mmu_fetch_16bit_val(memory_map, cpu_ptr->regPC), cpu_ptr->regA, memory_map);
@@ -383,14 +382,14 @@ void cpu_step(GameBoy * gameboy_ptr)
             cpu_ptr->regPC++;
             break;
         case 0xF0:
-            ld_r_addr(&(cpu_ptr->regA), 0xFF00 + ((uint16_t) mmu_fetch_8bit_val(memory_map, cpu_ptr->regPC)), memory_map);
+            ld_r_addr(&(cpu_ptr->regA), 0xFF00 + (uint16_t) memory_map[cpu_ptr->regPC], memory_map);
             cpu_ptr->regPC++;
             break;
         case 0xF2:
-            ld_r_addr(&(cpu_ptr->regA), 0xFF00 + ((uint16_t) cpu_ptr->regC), memory_map);
+            ld_r_addr(&(cpu_ptr->regA), 0xFF00 + (uint16_t) cpu_ptr->regC, memory_map);
             break;
         case 0xFE:
-            cp_a(mmu_fetch_8bit_val(memory_map, cpu_ptr->regPC), cpu_ptr);
+            cp_a(memory_map[cpu_ptr->regPC], cpu_ptr);
             cpu_ptr->regPC++;
             break;
         case 0xCB:
