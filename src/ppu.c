@@ -15,8 +15,8 @@
 
 #define PPU_FRAME_CYCLES 70224
 
-void ppu_render_scanline(GameBoy * gameboy_ptr);
-void ppu_synchronize_clocks(GameBoy * gameboy_ptr, Ppu * ppu_ptr);
+void render_scanline(GameBoy * gameboy_ptr);
+void synchronize_clocks(GameBoy * gameboy_ptr, Ppu * ppu_ptr);
 
 Ppu * ppu_init()
 {
@@ -32,7 +32,7 @@ void ppu_step(GameBoy * gameboy_ptr)
 {
     Ppu * ppu_ptr = gameboy_ptr->ppu_ptr;
 
-    ppu_synchronize_clocks(gameboy_ptr, ppu_ptr);
+    synchronize_clocks(gameboy_ptr, ppu_ptr);
 
     if (ppu_ptr->ppu_cur_mode == PPU_MODE_2 && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_2_CYCLES)
     {
@@ -44,7 +44,7 @@ void ppu_step(GameBoy * gameboy_ptr)
         ppu_ptr->ppu_cur_mode_clock = 0;
         ppu_ptr->ppu_cur_mode = PPU_MODE_0;
 
-        ppu_render_scanline(gameboy_ptr);
+        render_scanline(gameboy_ptr);
     }
     else if (ppu_ptr->ppu_cur_mode == PPU_MODE_0 && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_0_CYCLES)
     {
@@ -66,9 +66,9 @@ void ppu_step(GameBoy * gameboy_ptr)
     }
 }
 
-void ppu_render_scanline(GameBoy * gameboy_ptr){}
+void render_scanline(GameBoy * gameboy_ptr){}
 
-void ppu_synchronize_clocks(GameBoy * gameboy_ptr, Ppu * ppu_ptr)
+void synchronize_clocks(GameBoy * gameboy_ptr, Ppu * ppu_ptr)
 {
     uint8_t cycles = gameboy_prev_executed_cycles(gameboy_ptr);
 
