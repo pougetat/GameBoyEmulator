@@ -123,7 +123,8 @@ More tasks will be added below as I move through the project and gain a better u
 	
 	TASK : integrate building of SDL2 into make process
 	TASK : design GUI API that mmu will use to render
-TASK : implement snapshot rendering of VRAM
+	TASK : implement render of a scan line
+	TASK : implement interrupt handling so that CPU can modify scroll registers during H-blank period
 
 # Learning resources
 
