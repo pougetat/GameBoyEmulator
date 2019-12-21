@@ -1,6 +1,8 @@
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "ppu.h"
+#include "mmu.h"
 #include "gameboy.h"
 
 #define PPU_MODE_2 2  // Scanline (Accessing OAM)
@@ -14,6 +16,15 @@
 #define PPU_MODE_1_CYCLES 4560
 
 #define PPU_FRAME_CYCLES 70224
+
+#define LCDC_SPRITE_SIZE_MODE_8x8               0
+#define LCDC_SPRITE_SIZE_MODE_8x16              1
+#define LCDC_BG_TILEMAP_ADDR_MODE_9800_9BFF     0
+#define LCDC_BG_TILEMAP_ADDR_MODE_9C00_9FFF     1
+#define LCDC_BG_WIN_TILEMAP_ADDR_MODE_8800_97FF 0
+#define LCDC_BG_WIN_TILEMAP_ADDR_MODE_8000_8FFF 1
+#define LCDC_WIN_TILEMAP_ADDR_MODE_9800_9BFF    0
+#define LCDC_WIN_TILEMAP_ADDR_MODE_9C00_9FFF    1
 
 Ppu * ppu_init()
 {
@@ -72,3 +83,14 @@ void synchronize_clocks(GameBoy * gameboy_ptr, Ppu * ppu_ptr)
     ppu_ptr->ppu_cur_mode_clock += cycles;
     ppu_ptr->ppu_cur_frame_clock += cycles;
 }
+
+// LCDC functions
+
+bool    lcdc_bg_enabled(uint8_t * memory_map) { return (memory_map[R_LCDC_ADDR] & 0b1) != 0; }
+bool    lcdc_sprite_enabled(uint8_t * memory_map) { return (memory_map[R_LCDC_ADDR] & 0b10) != 0; }
+uint8_t lcdc_sprite_size_mode(uint8_t * memmory_map) { return memory_map[R_LCDC_ADDR] & 0b100; }
+uint8_t lcdc_bg_tilemap_addr_mode(uint8_t * memory_map) { return memory_map[R_LCDC_ADDR] & 0b1000; }
+uint8_t lcdc_bg_win_tilemap_addr_mode(uint8_t * memory_map) { return memory_map[R_LCDC_ADDR] & 0b10000; }
+bool    lcdc_win_enabled(uint8_t * memory_map) { return (memory_map[R_LCDC_ADDR] & 0b100000) != 0; }
+uint8_t lcdc_win_tilemap_addr_mode(uint8_t * memory_map) { return memory_map[R_LCDC_ADDR] & 0b1000000; }
+bool    lcdc_display_enabled(uint8_t * memory_map) { return (memory_map[R_LCDC_ADDR] & 0b10000000) != 0; }
