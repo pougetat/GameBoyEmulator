@@ -21,16 +21,19 @@
 #define LCDC_DISPLAY_ENABLED(LCDC_REG)                    (LCDC_REG & 0b10000000) == 1
 
 // STAT register related macros
-
 #define STAT_MODE_2(STAT_REG)              (STAT_REG & 0b00000011) == 0b00000010
 #define STAT_MODE_3(STAT_REG)              (STAT_REG & 0b00000011) == 0b00000011
 #define STAT_MODE_0(STAT_REG)              (STAT_REG & 0b00000011) == 0b00000000
 #define STAT_MODE_1(STAT_REG)              (STAT_REG & 0b00000011) == 0b00000010
 #define STAT_MATCH(STAT_REG)               (STAT_REG & 0b00000100) == 0b00000100
-#define STAT_INT_MODE_0_ENABLED(STAT_FLAG) (STAT_REG & 0b01111000) == 0b00001000
-#define STAT_INT_MODE_1_ENABLED(STAT_FLAG) (STAT_REG & 0b01111000) == 0b00010000
-#define STAT_INT_MODE_2_ENABLED(STAT_FLAG) (STAT_REG & 0b01111000) == 0b00100000
-#define STAT_INT_MATCH_ENABLED(STAT_FLAG)  (STAT_REG & 0b01111000) == 0b01000000
+#define STAT_INT_MODE_0_FLAG 0b00001000
+#define STAT_INT_MODE_1_FLAG 0b00010000
+#define STAT_INT_MODE_2_FLAG 0b00100000
+#define STAT_INT_MATCH_FLAG  0b01000000
+#define STAT_INT_MODE_0_ENABLED(STAT_FLAG) (STAT_REG & STAT_INT_MODE_0_FLAG) == 0b00001000
+#define STAT_INT_MODE_1_ENABLED(STAT_FLAG) (STAT_REG & STAT_INT_MODE_1_FLAG) == 0b00010000
+#define STAT_INT_MODE_2_ENABLED(STAT_FLAG) (STAT_REG & STAT_INT_MODE_2_FLAG) == 0b00100000
+#define STAT_INT_MATCH_ENABLED(STAT_FLAG)  (STAT_REG & STAT_INT_MATCH_FLAG) == 0b01000000
 
 #define PPU_MODE_2_CYCLES 80
 #define PPU_MODE_3_CYCLES 172
@@ -96,4 +99,14 @@ void change_stat_mode(Ppu * ppu_ptr, uint8_t * memory_map, uint8_t mode)
 {
     ppu_ptr->ppu_cur_mode_clock = 0;
     memory_map[R_STAT_ADDR] = (memory_map[R_STAT_ADDR] & 0b11111100) | mode;
+}
+
+void enable_stat_interrupts(uint8_t * memory_map, uint8_t interrupts)
+{
+    memory_map[R_STAT_ADDR] |= interrupts;
+}
+
+void clear_stat_interrupts(uint8_t * memory_map)
+{
+    memory_map[R_STAT_ADDR] &= 0b00000111;
 }

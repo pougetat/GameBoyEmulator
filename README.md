@@ -62,22 +62,6 @@ More tasks will be added below as I move through the project and gain a better u
 			https://gbdev.gg8.se/wiki/articles/LCDC
 			https://nnarain.github.io/2016/09/09/Gameboy-LCD-Controller.html
 	
-		General design philosophy
-		
-			MMU should #define LCD control register as address 0xFF40 (included in header file so that it is available to PPU)
-			The PPU never locks this register so no memory protection is needed
-		
-		To do items :
-		
-			0 - Implement lcdc_bg_enabled() -> set to 1 for logo scroll
-			1 - Implement lcdc_sprite_enabled()
-			2 - Implement lcdc_sprite_size_mode() -> _8_x_16 | _8_x_8
-			3 - Implement lcdc_bg_tilemap_addr_mode() -> _0x9800_...
-			4 - Implement lcdc_bg_win_tilemap_addr_mode() -> _0x….
-			5 - Implement lcdc_win_enabled()
-			6 - Implement lcdc_win_tilemap_addr_mode()
-			7 - Implement lcdc_display_enabled()
-	
 	TASK : implement LCD STAT register => 0xFF41 and remove ppu_cur_mode
 	
 		Brief explanation :
