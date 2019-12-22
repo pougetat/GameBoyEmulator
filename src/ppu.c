@@ -58,34 +58,27 @@ void ppu_step(GameBoy * gameboy_ptr)
 
     if (STAT_MODE_2(stat_reg) && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_2_CYCLES)
     {
-        ppu_ptr->ppu_cur_mode_clock = 0;
-        // CHANGE STAT MODE TO 3
-        
+        change_stat_mode(ppu_ptr, memory_map, 3);
     }
     else if (STAT_MODE_3(stat_reg) && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_3_CYCLES)
     {
-        ppu_ptr->ppu_cur_mode_clock = 0;
-        // CHANGE STAT MODE TO 0
-
+        change_stat_mode(ppu_ptr, memory_map, 0);
         render_scanline(gameboy_ptr);
     }
     else if (STAT_MODE_0(stat_reg) && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_0_CYCLES)
     {
-        ppu_ptr->ppu_cur_mode_clock = 0;
-
         if (ppu_ptr->ppu_cur_frame_clock >= PPU_FRAME_CYCLES)
         {
-            // CHANGE STAT MODE TO 1
+            change_stat_mode(ppu_ptr, memory_map, 1);
         }
         else
         {
-            // CHANGE STAT MODE TO 2
+            change_stat_mode(ppu_ptr, memory_map, 2);
         }
     }
     else if (STAT_MODE_1(stat_reg) && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_1_CYCLES)
     {
-        ppu_ptr->ppu_cur_mode_clock = 0;
-        // CHANGE STAT MODE TO 2
+        change_stat_mode(ppu_ptr, memory_map, 2);
     }
 }
 
@@ -97,4 +90,10 @@ void synchronize_clocks(GameBoy * gameboy_ptr, Ppu * ppu_ptr)
 
     ppu_ptr->ppu_cur_mode_clock += cycles;
     ppu_ptr->ppu_cur_frame_clock += cycles;
+}
+
+void change_stat_mode(Ppu * ppu_ptr, uint8_t * memory_map, uint8_t mode)
+{
+    ppu_ptr->ppu_cur_mode_clock = 0;
+    memory_map[R_STAT_ADDR] = (memory_map[R_STAT_ADDR] & 0b11111100) | mode;
 }
