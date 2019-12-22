@@ -7,38 +7,30 @@
 
 // LCDC register related macros
 
-#define LCDC_BG_ENABLED(LCDC_REG)               LCDC_REG & 0b00000001
-#define LCDC_SPRITE_ENABLED(LCDC_REG)           LCDC_REG & 0b00000010
-#define LCDC_SPRITE_SIZE_MODE(LCDC_REG)         LCDC_REG & 0b00000100
-#define LCDC_BG_TILEMAP_ADDR_MODE(LCDC_REG)     LCDC_REG & 0b00001000
-#define LCDC_BG_WIN_TILEMAP_ADDR_MODE(LCDC_REG) LCDC_REG & 0b00010000
-#define LCDC_WIN_ENABLED(LCDC_REG)              LCDC_REG & 0b00100000
-#define LCDC_WIN_TILEMAP_ADDR_MODE(LCDC_REG)    LCDC_REG & 0b01000000
-#define LCDC_DISPLAY_ENABLED(LCDC_REG)          LCDC_REG & 0b10000000
-
-#define LCDC_SPRITE_SIZE_MODE_8x8               0b00000000
-#define LCDC_SPRITE_SIZE_MODE_8x16              0b00000100
-#define LCDC_BG_TILEMAP_ADDR_MODE_9800_9BFF     0b00000000
-#define LCDC_BG_TILEMAP_ADDR_MODE_9C00_9FFF     0b00001000
-#define LCDC_BG_WIN_TILEMAP_ADDR_MODE_8800_97FF 0b00000000
-#define LCDC_BG_WIN_TILEMAP_ADDR_MODE_8000_8FFF 0b00100000
-#define LCDC_WIN_TILEMAP_ADDR_MODE_9800_9BFF    0b00000000
-#define LCDC_WIN_TILEMAP_ADDR_MODE_9C00_9FFF    0b01000000
+#define LCDC_BG_ENABLED(LCDC_REG)                         (LCDC_REG & 0b00000001) == 1
+#define LCDC_SPRITE_ENABLED(LCDC_REG)                     (LCDC_REG & 0b00000010) == 1
+#define LCDC_SPRITE_SIZE_MODE_8x8(LCDC_REG)               (LCDC_REG & 0b00000100) == 0
+#define LCDC_SPRITE_SIZE_MODE_8x16(LCDC_REG)              (LCDC_REG & 0b00000100) == 1
+#define LCDC_BG_TILEMAP_ADDR_MODE_9800_9BFF(LCDC_REG)     (LCDC_REG & 0b00001000) == 0
+#define LCDC_BG_TILEMAP_ADDR_MODE_9C00_9FFF(LCDC_REG)     (LCDC_REG & 0b00001000) == 1
+#define LCDC_BG_WIN_TILEMAP_ADDR_MODE_8800_97FF(LCDC_REG) (LCDC_REG & 0b00010000) == 0
+#define LCDC_BG_WIN_TILEMAP_ADDR_MODE_8000_8FFF(LCDC_REG) (LCDC_REG & 0b00010000) == 1
+#define LCDC_WIN_ENABLED(LCDC_REG)                        (LCDC_REG & 0b00100000) == 1
+#define LCDC_WIN_TILEMAP_ADDR_MODE_9800_9BFF(LCDC_REG)    (LCDC_REG & 0b01000000) == 0
+#define LCDC_WIN_TILEMAP_ADDR_MODE_9C00_9FFF(LCDC_REG)    (LCDC_REG & 0b01000000) == 1
+#define LCDC_DISPLAY_ENABLED(LCDC_REG)                    (LCDC_REG & 0b10000000) == 1
 
 // STAT register related macros
 
-#define STAT_MODE(STAT_REG)           STAT_REG & 0b00000011
-#define STAT_MATCH(STAT_REG)          STAT_REG & 0b00000100
-#define STAT_INT_SELECTION(STAT_FLAG) STAT_REG & 0b01111000
-
-#define STAT_MODE_2             0b00000010   // Scanline (Accessing OAM)
-#define STAT_MODE_3             0b00000011   // Scanline (Accessing VRAM)
-#define STAT_MODE_0             0b00000000   // Horizontal blank 
-#define STAT_MODE_1             0b00000001   // Vertical blank
-#define STAT_INT_MODE_0_ENABLED 0b00010000
-#define STAT_INT_MODE_1_ENABLED 0b00100000
-#define STAT_INT_MODE_2_ENABLED 0b01000000
-#define STAT_INT_MATCH_ENABLED  0b10000000
+#define STAT_MODE_2(STAT_REG)              (STAT_REG & 0b00000011) == 0b00000010
+#define STAT_MODE_3(STAT_REG)              (STAT_REG & 0b00000011) == 0b00000011
+#define STAT_MODE_0(STAT_REG)              (STAT_REG & 0b00000011) == 0b00000000
+#define STAT_MODE_1(STAT_REG)              (STAT_REG & 0b00000011) == 0b00000010
+#define STAT_MATCH(STAT_REG)               (STAT_REG & 0b00000100) == 0b00000100
+#define STAT_INT_MODE_0_ENABLED(STAT_FLAG) (STAT_REG & 0b01111000) == 0b00001000
+#define STAT_INT_MODE_1_ENABLED(STAT_FLAG) (STAT_REG & 0b01111000) == 0b00010000
+#define STAT_INT_MODE_2_ENABLED(STAT_FLAG) (STAT_REG & 0b01111000) == 0b00100000
+#define STAT_INT_MATCH_ENABLED(STAT_FLAG)  (STAT_REG & 0b01111000) == 0b01000000
 
 #define PPU_MODE_2_CYCLES 80
 #define PPU_MODE_3_CYCLES 172
@@ -64,20 +56,20 @@ void ppu_step(GameBoy * gameboy_ptr)
     uint8_t * memory_map = gameboy_ptr->mmu_ptr->memory_map;
     uint8_t stat_reg = memory_map[R_STAT_ADDR];
 
-    if (STAT_MODE(stat_reg) == STAT_MODE_2 && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_2_CYCLES)
+    if (STAT_MODE_2(stat_reg) && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_2_CYCLES)
     {
         ppu_ptr->ppu_cur_mode_clock = 0;
         // CHANGE STAT MODE TO 3
         
     }
-    else if (STAT_MODE(stat_reg) == STAT_MODE_3 && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_3_CYCLES)
+    else if (STAT_MODE_3(stat_reg) && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_3_CYCLES)
     {
         ppu_ptr->ppu_cur_mode_clock = 0;
         // CHANGE STAT MODE TO 0
 
         render_scanline(gameboy_ptr);
     }
-    else if (STAT_MODE(stat_reg) == STAT_MODE_0 && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_0_CYCLES)
+    else if (STAT_MODE_0(stat_reg) && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_0_CYCLES)
     {
         ppu_ptr->ppu_cur_mode_clock = 0;
 
@@ -90,7 +82,7 @@ void ppu_step(GameBoy * gameboy_ptr)
             // CHANGE STAT MODE TO 2
         }
     }
-    else if (STAT_MODE(stat_reg) == STAT_MODE_1 && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_1_CYCLES)
+    else if (STAT_MODE_1(stat_reg) && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_1_CYCLES)
     {
         ppu_ptr->ppu_cur_mode_clock = 0;
         // CHANGE STAT MODE TO 2
