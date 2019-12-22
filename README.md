@@ -49,7 +49,7 @@ More tasks will be added below as I move through the project and gain a better u
 => Implement logo scroll
 
 	New philosophy
-		-> components can directly talk to each other, gameboy struct is still use as owner of all the component pointers, is responsible for stepping through the various components, and synchronizing their clocks.
+		-> components can directly talk to each other, gameboy struct is still used as owner of all the component pointers, is responsible for stepping through the various components, and synchronizing their clocks.
 
 	TASK : Implement LCD control register => 0xFF40
 	
@@ -78,7 +78,7 @@ More tasks will be added below as I move through the project and gain a better u
 			6 - Implement lcdc_win_tilemap_addr_mode()
 			7 - Implement lcdc_display_enabled()
 	
-	TASK : implement LCD STAT register => 0xFF41
+	TASK : implement LCD STAT register => 0xFF41 and remove ppu_cur_mode
 	
 		Brief explanation :
 	

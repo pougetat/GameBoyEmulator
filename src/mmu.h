@@ -16,7 +16,7 @@ typedef struct Mmu {
     // LCD related registers
 
 #define R_LCDC_ADDR 0xFF40 // LCD contol (R/W)
-#define R_STAT_ADDR 0xFF41 // LCDC status (R/W)
+#define R_STAT_ADDR 0xFF41 // LCD status (R/W)
 #define R_SCY_ADDR 0xFF42  // Scroll Y (R/W)
 #define R_SCX_ADDR 0xFF43  // Scroll X (R/W)
 #define R_LY_ADDR 0xFF44   // LCDC Y-Coordinate (R)
