@@ -1,5 +1,5 @@
 build:
-	gcc-9 src/main.c src/gameboy.c src/cpu.c src/mmu.c src/ppu.c -o src/emulator.exe
+	gcc-9 src/main.c src/gameboy.c src/cpu.c src/mmu.c src/ppu.c src/gui/gui.c -l SDL2 -o src/emulator.exe
 
 build-tests:
 	gcc-9 tests/boot_tests.c src/gameboy.c src/cpu.c src/mmu.c src/ppu.c -o tests/boot_test.exe

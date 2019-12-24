@@ -65,6 +65,7 @@ Ppu * ppu_init()
     Ppu * ppu_ptr = malloc(sizeof(Ppu));
     ppu_ptr->ppu_cur_mode_clock = 0;
     ppu_ptr->ppu_cur_frame_clock = 0;
+    gui_init(ppu_ptr->gui_ptr);
 
     return ppu_ptr;
 }
@@ -84,13 +85,15 @@ void ppu_step(GameBoy * gameboy_ptr)
     else if (STAT_MODE_3(stat_reg) && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_3_CYCLES)
     {
         change_stat_mode(ppu_ptr, memory_map, 0);
-        // fill pixel line and send to ui
+        uint8_t * pixel_line = gui_get_frame_line(0, ppu_ptr->gui_ptr);
+        fill_pixel_line(pixel_line, memory_map);
     }
     else if (STAT_MODE_0(stat_reg) && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_0_CYCLES)
     {
         if (ppu_ptr->ppu_cur_frame_clock >= PPU_FRAME_CYCLES)
         {
             change_stat_mode(ppu_ptr, memory_map, 1);
+            gui_render_frame();
         }
         else
         {
