@@ -11,7 +11,7 @@ SDL_Surface* screenSurface = NULL;
 
 void gui_init(Gui * gui_ptr)
 {
-    SDL_CreateWindowAndRenderer(800, 600, 0, &window, &renderer);
+    SDL_CreateWindowAndRenderer(160, 144, 0, &window, &renderer);
 }
 
 uint8_t * gui_get_frame_line(uint8_t gui_screen_line, Gui * gui_ptr)

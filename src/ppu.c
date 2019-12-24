@@ -85,8 +85,11 @@ void ppu_step(GameBoy * gameboy_ptr)
     else if (STAT_MODE_3(stat_reg) && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_3_CYCLES)
     {
         change_stat_mode(ppu_ptr, memory_map, 0);
+        
         uint8_t * pixel_line = gui_get_frame_line(0, ppu_ptr->gui_ptr);
         fill_pixel_line(pixel_line, memory_map);
+    
+        memory_map[R_LY_ADDR]++;
     }
     else if (STAT_MODE_0(stat_reg) && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_0_CYCLES)
     {
@@ -108,8 +111,8 @@ void ppu_step(GameBoy * gameboy_ptr)
 
 void fill_pixel_line(uint8_t pixel_line[], uint8_t * memory_map)
 {
-    uint8_t cur_y = 0; // will be set to scy + ly
-    uint8_t cur_x = 0; // will be set to scx
+    uint8_t cur_y = memory_map[R_SCY_ADDR] + memory_map[R_LY_ADDR];
+    uint8_t cur_x = memory_map[R_SCX_ADDR];
 
     for (uint8_t i = 0; i < SCREEN_PIXEL_WIDTH; i++)
     {

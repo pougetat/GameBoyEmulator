@@ -21,7 +21,7 @@ More tasks will be added below as I move through the project and gain a better u
 	TASK : [Makefile] improvements can be made looking at standard makefiles
 	TASK : make header files follow the same format (include order, external APIs prefixed but not internal APIs)
 
-=> Implement all instructions necessary for boot rom
+=> Elements necessary to execute the entire boot rom
 
 	TASK : implement LD instructions
 	TASK : implement XOR instructions
@@ -46,12 +46,9 @@ More tasks will be added below as I move through the project and gain a better u
 	TASK : [test] verify loading of 8 additional bytes into VRAM
 	TASK : [test] verify background tilemap setup
 	
-=> Implement logo scroll
+=> Elements of logo scrolling
 
-	New philosophy
-		-> components can directly talk to each other, gameboy struct is still used as owner of all the component pointers, is responsible for stepping through the various components, and synchronizing their clocks.
-
-	TASK : Implement LCD control register => 0xFF40
+	LCD CONTROL register => 0xFF40
 	
 		Brief explanation :
 		
@@ -62,7 +59,7 @@ More tasks will be added below as I move through the project and gain a better u
 			https://gbdev.gg8.se/wiki/articles/LCDC
 			https://nnarain.github.io/2016/09/09/Gameboy-LCD-Controller.html
 	
-	TASK : implement LCD STAT register => 0xFF41 and remove ppu_cur_mode
+	LCD STAT register => 0xFF41
 	
 		Brief explanation :
 	
@@ -96,9 +93,6 @@ More tasks will be added below as I move through the project and gain a better u
 			
 			Indicates the vertical line to which the present data is transferred to the LCD driver (values : 0 -> 153). 
 	
-	TASK : integrate building of SDL2 into make process
-	TASK : design GUI API that mmu will use to render
-	TASK : implement render of a scan line
 	TASK : implement interrupt handling so that CPU can modify scroll registers during H-blank period
 
 # Learning resources
