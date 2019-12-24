@@ -72,10 +72,16 @@ Ppu * ppu_init()
 
 void ppu_step(GameBoy * gameboy_ptr)
 {
-    Ppu * ppu_ptr = gameboy_ptr->ppu_ptr;
-    synchronize_clocks(gameboy_ptr, ppu_ptr);
-
     uint8_t * memory_map = gameboy_ptr->mmu_ptr->memory_map;
+    
+    if (!LCDC_DISPLAY_ENABLED(memory_map[R_LCDC_ADDR]))
+    {
+        return;
+    }
+
+    Ppu * ppu_ptr = gameboy_ptr->ppu_ptr;
+
+    synchronize_clocks(gameboy_ptr, ppu_ptr);
     uint8_t stat_reg = memory_map[R_STAT_ADDR];
 
     if (STAT_MODE_2(stat_reg) && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_2_CYCLES)
