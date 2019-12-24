@@ -116,6 +116,8 @@ void ppu_step(GameBoy * gameboy_ptr)
     {
         change_stat_mode(ppu_ptr, memory_map, 2);
     }
+
+    debug_ppu(memory_map, ppu_ptr);
 }
 
 void fill_pixel_line(uint8_t pixel_line[], uint8_t * memory_map)
@@ -178,4 +180,13 @@ void enable_stat_interrupts(uint8_t * memory_map, uint8_t interrupts)
 void clear_stat_interrupts(uint8_t * memory_map)
 {
     memory_map[R_STAT_ADDR] &= 0b00000111;
+}
+
+void debug_ppu(uint8_t * memory_map, Ppu * ppu_ptr)
+{
+    printf("PPU state : \n \n");
+    printf("    ppu cur mode clock = %i \n", ppu_ptr->ppu_cur_mode_clock);
+    printf("    ppu cur frame clock = %i \n", ppu_ptr->ppu_cur_frame_clock);
+
+    printf("\n");
 }
