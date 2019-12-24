@@ -435,6 +435,7 @@ void cpu_step(GameBoy * gameboy_ptr)
             break;
     }
 
+    cpu_ptr->prev_instruction_cycles += 4; // this will be changed
     debug_cpu(memory_map, cpu_ptr);
 }
 

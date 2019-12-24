@@ -97,6 +97,9 @@ void ppu_step(GameBoy * gameboy_ptr)
         {
             change_stat_mode(ppu_ptr, memory_map, 1);
             gui_render_frame();
+
+            memory_map[R_LY_ADDR] = 0;
+            ppu_ptr->ppu_cur_frame_clock = 0;
         }
         else
         {
