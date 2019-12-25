@@ -72,14 +72,16 @@ Ppu * ppu_init()
 
 void ppu_step(GameBoy * gameboy_ptr)
 {
-    uint8_t * memory_map = gameboy_ptr->mmu_ptr->memory_map;
+    printf("ppu => step start \n");
     
+    uint8_t * memory_map = gameboy_ptr->mmu_ptr->memory_map;
+    Ppu * ppu_ptr = gameboy_ptr->ppu_ptr;
+    debug_ppu(memory_map, ppu_ptr);
+
     if (!LCDC_DISPLAY_ENABLED(memory_map[R_LCDC_ADDR]))
     {
         return;
     }
-
-    Ppu * ppu_ptr = gameboy_ptr->ppu_ptr;
 
     synchronize_clocks(gameboy_ptr, ppu_ptr);
     uint8_t stat_reg = memory_map[R_STAT_ADDR];
@@ -92,7 +94,7 @@ void ppu_step(GameBoy * gameboy_ptr)
     {
         change_stat_mode(ppu_ptr, memory_map, 0);
         
-        uint8_t * pixel_line = gui_get_frame_line(0, ppu_ptr->gui_ptr);
+        uint8_t * pixel_line = gui_get_frame_line(memory_map[R_LY_ADDR], ppu_ptr->gui_ptr);
         fill_pixel_line(pixel_line, memory_map);
         memory_map[R_LY_ADDR]++;
     }
@@ -116,7 +118,7 @@ void ppu_step(GameBoy * gameboy_ptr)
         change_stat_mode(ppu_ptr, memory_map, 2);
     }
 
-    debug_ppu(memory_map, ppu_ptr);
+    printf("ppu => step end \n");
 }
 
 void fill_pixel_line(uint8_t pixel_line[], uint8_t * memory_map)
@@ -185,6 +187,8 @@ void debug_ppu(uint8_t * memory_map, Ppu * ppu_ptr)
     printf("PPU state : \n \n");
     printf("    ppu cur mode clock = %i \n", ppu_ptr->ppu_cur_mode_clock);
     printf("    ppu cur frame clock = %i \n", ppu_ptr->ppu_cur_frame_clock);
+    printf("    ppu cur mode = %i \n", memory_map[R_STAT_ADDR] & 0b11);
+    printf("    LY = %i \n", memory_map[R_LY_ADDR]);
 
     printf("\n");
 }

@@ -275,6 +275,9 @@ void cpu_step(GameBoy * gameboy_ptr)
         case 0x13:
             inc_rr(&(cpu_ptr->regD), &(cpu_ptr->regE));
             break;
+        case 0x15:
+            dec_r(&(cpu_ptr->regD), cpu_ptr);
+            break;
         case 0x16:
             ld_r_n(&(cpu_ptr->regD), cpu_ptr, memory_map);                        
             cpu_ptr->regPC++;
@@ -288,6 +291,9 @@ void cpu_step(GameBoy * gameboy_ptr)
             break;
         case 0x1A:
             ld_r_addr(&(cpu_ptr->regA), REG_PAIR_VAL(cpu_ptr->regD, cpu_ptr->regE), memory_map);
+            break;
+        case 0x1D:
+            dec_r(&(cpu_ptr->regE), cpu_ptr);
             break;
         case 0x1E:
             ld_r_n(&(cpu_ptr->regE), cpu_ptr, memory_map);            
@@ -307,6 +313,9 @@ void cpu_step(GameBoy * gameboy_ptr)
         case 0x23:
             inc_rr(&(cpu_ptr->regH), &(cpu_ptr->regL));
             break;
+        case 0x25:
+            dec_r(&(cpu_ptr->regH), cpu_ptr);
+            break;
         case 0x26:
             ld_r_n(&(cpu_ptr->regH), cpu_ptr, memory_map);            
             cpu_ptr->regPC++;
@@ -314,6 +323,9 @@ void cpu_step(GameBoy * gameboy_ptr)
         case 0x28:
             jr_z_sn(cpu_ptr, memory_map);
             cpu_ptr->regPC++;
+            break;
+        case 0x2D:
+            dec_r(&(cpu_ptr->regL), cpu_ptr);
             break;
         case 0x2E:
             ld_r_n(&(cpu_ptr->regL), cpu_ptr, memory_map);                        
@@ -425,13 +437,13 @@ void cpu_step(GameBoy * gameboy_ptr)
                     bit(7, *get_reg_by_num(cpu_ptr, opcode & 0b111), cpu_ptr);
                     break;
                 default:
-                    printf("%i", 0/0);
+                    printf("Register not found : %i \n", 0/0);
                     break;
             }
             break;
 
         default:
-            printf("%i", 0/0);
+            printf("Instruction not implemennted : %i \n", 0/0);
             break;
     }
 
