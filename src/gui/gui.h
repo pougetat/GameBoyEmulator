@@ -9,10 +9,10 @@
 #define GUI_SCREEN_PIXEL_WIDTH 160
 
 typedef struct Gui {
-    uint8_t frame_data[GUI_SCREEN_PIXEL_HEIGHT][GUI_SCREEN_PIXEL_WIDTH];
+    uint8_t ** frame_data;
 } Gui;
 
-void gui_init(Gui * gui_ptr);
+Gui * gui_init();
 uint8_t * gui_get_frame_line(uint8_t gui_screen_line, Gui * gui_ptr);
 void gui_render_frame();
 

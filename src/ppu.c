@@ -65,7 +65,7 @@ Ppu * ppu_init()
     Ppu * ppu_ptr = malloc(sizeof(Ppu));
     ppu_ptr->ppu_cur_mode_clock = 0;
     ppu_ptr->ppu_cur_frame_clock = 0;
-    gui_init(ppu_ptr->gui_ptr);
+    ppu_ptr->gui_ptr = gui_init();
 
     return ppu_ptr;
 }
@@ -94,7 +94,6 @@ void ppu_step(GameBoy * gameboy_ptr)
         
         uint8_t * pixel_line = gui_get_frame_line(0, ppu_ptr->gui_ptr);
         fill_pixel_line(pixel_line, memory_map);
-    
         memory_map[R_LY_ADDR]++;
     }
     else if (STAT_MODE_0(stat_reg) && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_0_CYCLES)
@@ -146,7 +145,6 @@ uint8_t * get_tile_data_addr(uint8_t cur_x, uint8_t cur_y, uint8_t * memory_map)
 uint8_t get_tile_pixel(uint8_t tile_offset_x, uint8_t tile_offset_y, uint8_t * tile_data_addr)
 {
     // explanation here => https://www.huderlem.com/demos/gameboy2bpp.html
-
     uint8_t pixel_bit_high = (tile_data_addr[tile_offset_y * 2] & (0b10000000 >> tile_offset_x)) >> (TILE_PIXEL_WIDTH - tile_offset_x);
     uint8_t pixel_bit_low = (tile_data_addr[tile_offset_y * 2 + 1] & (0b10000000 >> tile_offset_x)) >> (TILE_PIXEL_WIDTH - tile_offset_x);
     return (pixel_bit_high << 1) | pixel_bit_low;

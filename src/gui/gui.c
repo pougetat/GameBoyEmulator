@@ -9,9 +9,24 @@ SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
 SDL_Surface* screenSurface = NULL;
 
-void gui_init(Gui * gui_ptr)
+Gui * gui_init()
 {
-    SDL_CreateWindowAndRenderer(160, 144, 0, &window, &renderer);
+    Gui * gui_ptr = malloc(sizeof(Gui));
+
+    gui_ptr->frame_data = malloc(GUI_SCREEN_PIXEL_HEIGHT * sizeof(uint8_t *));
+    for (uint8_t i = 0; i < GUI_SCREEN_PIXEL_HEIGHT; i++)
+    {
+        gui_ptr->frame_data[i] = malloc(GUI_SCREEN_PIXEL_WIDTH * sizeof(uint8_t));
+    }
+
+    SDL_CreateWindowAndRenderer(
+        GUI_SCREEN_PIXEL_WIDTH,
+        GUI_SCREEN_PIXEL_HEIGHT,
+        0,
+        &window,
+        &renderer
+    );
+    return gui_ptr;
 }
 
 uint8_t * gui_get_frame_line(uint8_t gui_screen_line, Gui * gui_ptr)
