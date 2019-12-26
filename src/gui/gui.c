@@ -12,11 +12,16 @@ SDL_Surface* screenSurface = NULL;
 Gui * gui_init()
 {
     Gui * gui_ptr = malloc(sizeof(Gui));
-
     gui_ptr->frame_data = malloc(GUI_SCREEN_PIXEL_HEIGHT * sizeof(uint8_t *));
+
     for (uint8_t i = 0; i < GUI_SCREEN_PIXEL_HEIGHT; i++)
     {
         gui_ptr->frame_data[i] = malloc(GUI_SCREEN_PIXEL_WIDTH * sizeof(uint8_t));
+    }
+
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        fprintf(stderr, "could not initialize sdl2: %s\n", SDL_GetError());
+        return;
     }
 
     SDL_CreateWindowAndRenderer(
@@ -27,11 +32,6 @@ Gui * gui_init()
         &renderer
     );
     return gui_ptr;
-}
-
-uint8_t * gui_get_frame_line(uint8_t gui_screen_line, Gui * gui_ptr)
-{
-    return &(gui_ptr->frame_data[gui_screen_line]);
 }
 
 void gui_render_frame(Gui * gui_ptr)

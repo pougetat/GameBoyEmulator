@@ -24,11 +24,6 @@ void mmu_read_rom(struct Mmu * mmu, FILE * rom_file)
         mmu->memory_map[cur_pos++] = (uint8_t) byte;
     }
     fclose(rom_file);
-
-    for (int i = 0; i < 256; i++) {
-        printf("%i : %x \n", i, mmu->memory_map[i]);
-    }
-    printf("\n");
 }
 
 // GB is little endian so we handle the conversion here

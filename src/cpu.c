@@ -71,6 +71,17 @@ void dec_rr(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr)
     }
 }
 
+// subtract registers
+/*
+void sub_r_r(uint8_t * reg1_ptr, uint8_t reg2)
+{
+    SET_H_FLAG(cpu_ptr, !WILL_BORROW_FROM_4(*reg_ptr));
+    *reg1_ptr -= reg2_ptr;
+    SET_Z_FLAG(cpu_ptr, (*reg1_ptr == 0));
+    SET_N_FLAG(cpu_ptr, 1);
+}
+*/
+
 // register_dest <- immediate n
 void ld_r_n(uint8_t * reg_ptr, struct Cpu * cpu_ptr, uint8_t * memory_map)
 {
@@ -275,6 +286,9 @@ void cpu_step(GameBoy * gameboy_ptr)
         case 0x13:
             inc_rr(&(cpu_ptr->regD), &(cpu_ptr->regE));
             break;
+        case 0x14:
+            inc_r(&(cpu_ptr->regD), cpu_ptr);
+            break;
         case 0x15:
             dec_r(&(cpu_ptr->regD), cpu_ptr);
             break;
@@ -291,6 +305,9 @@ void cpu_step(GameBoy * gameboy_ptr)
             break;
         case 0x1A:
             ld_r_addr(&(cpu_ptr->regA), REG_PAIR_VAL(cpu_ptr->regD, cpu_ptr->regE), memory_map);
+            break;
+        case 0x1C:
+            inc_r(&(cpu_ptr->regE), cpu_ptr);
             break;
         case 0x1D:
             dec_r(&(cpu_ptr->regE), cpu_ptr);
@@ -312,6 +329,9 @@ void cpu_step(GameBoy * gameboy_ptr)
             break;
         case 0x23:
             inc_rr(&(cpu_ptr->regH), &(cpu_ptr->regL));
+            break;
+        case 0x24:
+            inc_r(&(cpu_ptr->regH), cpu_ptr);
             break;
         case 0x25:
             dec_r(&(cpu_ptr->regH), cpu_ptr);
@@ -337,6 +357,9 @@ void cpu_step(GameBoy * gameboy_ptr)
             break;
         case 0x32:
             ldd_addr_r(&(cpu_ptr->regH), &(cpu_ptr->regL), cpu_ptr->regA, memory_map);
+            break;
+        case 0x3C:
+            inc_r(&(cpu_ptr->regA), cpu_ptr);
             break;
         case 0x3D:
             dec_r(&(cpu_ptr->regA), cpu_ptr);
@@ -443,7 +466,8 @@ void cpu_step(GameBoy * gameboy_ptr)
             break;
 
         default:
-            printf("Instruction not implemennted : %i \n", 0/0);
+            printf("Instruction not implemented \n");
+            printf("%i \n", 0/0);
             break;
     }
 

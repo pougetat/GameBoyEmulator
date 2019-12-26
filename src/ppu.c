@@ -36,10 +36,10 @@
 #define STAT_INT_MODE_2_ENABLED(STAT_FLAG) (STAT_REG & STAT_INT_MODE_2_FLAG) == 0b00100000
 #define STAT_INT_MATCH_ENABLED(STAT_FLAG)  (STAT_REG & STAT_INT_MATCH_FLAG) == 0b01000000
 
-#define PPU_MODE_2_CYCLES 80
-#define PPU_MODE_3_CYCLES 172
-#define PPU_MODE_0_CYCLES 204
-#define PPU_MODE_1_CYCLES 4560
+#define PPU_MODE_2_CYCLES 80    // OAM search : Scanning OAM for sprite coordinates that appear on this line
+#define PPU_MODE_3_CYCLES 172   // Reading OAM and VRAM to generate picture
+#define PPU_MODE_0_CYCLES 204   // H-blank
+#define PPU_MODE_1_CYCLES 4560  // V-blank
 #define PPU_FRAME_CYCLES 70224
 
 // LCD related macros
@@ -53,7 +53,7 @@
 
 // Functions used in this file
 
-void fill_pixel_line(uint8_t pixel_line[], uint8_t * memory_map);
+void fill_frame_pixel_line(uint8_t line, Gui * gui_ptr, uint8_t * memory_map);
 uint8_t * get_tile_data_addr(uint8_t cur_x, uint8_t cur_y, uint8_t * memory_map);
 uint8_t get_pixel(uint8_t cur_x, uint8_t cur_y, uint8_t * memory_map);
 uint8_t get_tile_pixel(uint8_t tile_offset_x, uint8_t tile_offset_y, uint8_t * tile_data_addr);
@@ -66,7 +66,6 @@ Ppu * ppu_init()
     ppu_ptr->ppu_cur_mode_clock = 0;
     ppu_ptr->ppu_cur_frame_clock = 0;
     ppu_ptr->gui_ptr = gui_init();
-
     return ppu_ptr;
 }
 
@@ -92,18 +91,38 @@ void ppu_step(GameBoy * gameboy_ptr)
     }
     else if (STAT_MODE_3(stat_reg) && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_3_CYCLES)
     {
+        // this is bad, we should instead figure out why the emulator
         change_stat_mode(ppu_ptr, memory_map, 0);
         
-        uint8_t * pixel_line = gui_get_frame_line(memory_map[R_LY_ADDR], ppu_ptr->gui_ptr);
-        fill_pixel_line(pixel_line, memory_map);
+        uint8_t line_to_fill = memory_map[R_LY_ADDR];
+        fill_frame_pixel_line(line_to_fill, ppu_ptr->gui_ptr, memory_map);
         memory_map[R_LY_ADDR]++;
     }
     else if (STAT_MODE_0(stat_reg) && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_0_CYCLES)
     {
-        if (ppu_ptr->ppu_cur_frame_clock >= PPU_FRAME_CYCLES)
+        if ((memory_map[R_LY_ADDR] == 144 || memory_map[R_LY_ADDR] == 200) && ppu_ptr->ppu_cur_frame_clock < PPU_FRAME_CYCLES)
+        //if (false)
         {
+            /*
+                UGLY HACK :
+
+                This should not occur but it does for some reason (our PPU is not mode/cycle accurate).
+                As a result we opt to let cycles go by while waiting for us to hit PPU_FRAME_CYCLES.
+                
+                Since game logic will check LY = 144 in a loop (example : boot ROM regarding logo scroll)
+                to modify scroll values / update VRAM, we set the value to 200 to prevent this from happening
+                before a frame has truly been rendered. Otherwise, in two loop iterations, LY would potentially
+                still be equal to 144 and game logic would take this as 2 separate frames instead of 1.
+            */
+
+            memory_map[R_LY_ADDR] = 200;
+        }
+        else if (ppu_ptr->ppu_cur_frame_clock >= PPU_FRAME_CYCLES)
+        //else if (memory_map[R_LY_ADDR] == 144)
+        {
+            memory_map[R_LY_ADDR] = 144; // see ugly hack above, we now restore the correct value (it was potentially 200 before)
             change_stat_mode(ppu_ptr, memory_map, 1);
-            gui_render_frame();
+            gui_render_frame(ppu_ptr->gui_ptr);
 
             memory_map[R_LY_ADDR] = 0;
             ppu_ptr->ppu_cur_frame_clock = 0;
@@ -121,14 +140,14 @@ void ppu_step(GameBoy * gameboy_ptr)
     printf("ppu => step end \n");
 }
 
-void fill_pixel_line(uint8_t pixel_line[], uint8_t * memory_map)
+void fill_frame_pixel_line(uint8_t line, Gui * gui_ptr, uint8_t * memory_map)
 {
     uint8_t cur_y = memory_map[R_SCY_ADDR] + memory_map[R_LY_ADDR];
     uint8_t cur_x = memory_map[R_SCX_ADDR];
 
     for (uint8_t i = 0; i < SCREEN_PIXEL_WIDTH; i++)
     {
-        pixel_line[i] = get_pixel(cur_x + i, cur_y, memory_map);
+        gui_ptr->frame_data[line][i] = get_pixel(cur_x + i, cur_y, memory_map);
     }
 }
 

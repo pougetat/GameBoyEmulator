@@ -13,7 +13,6 @@ typedef struct Gui {
 } Gui;
 
 Gui * gui_init();
-uint8_t * gui_get_frame_line(uint8_t gui_screen_line, Gui * gui_ptr);
 void gui_render_frame();
 
 #endif
