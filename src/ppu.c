@@ -25,7 +25,7 @@
 #define STAT_MODE_2(STAT_REG)              (STAT_REG & 0b00000011) == 0b00000010
 #define STAT_MODE_3(STAT_REG)              (STAT_REG & 0b00000011) == 0b00000011
 #define STAT_MODE_0(STAT_REG)              (STAT_REG & 0b00000011) == 0b00000000
-#define STAT_MODE_1(STAT_REG)              (STAT_REG & 0b00000011) == 0b00000010
+#define STAT_MODE_1(STAT_REG)              (STAT_REG & 0b00000011) == 0b00000001
 #define STAT_MATCH(STAT_REG)               (STAT_REG & 0b00000100) == 0b00000100
 #define STAT_INT_MODE_0_FLAG 0b00001000
 #define STAT_INT_MODE_1_FLAG 0b00010000
@@ -40,6 +40,8 @@
 #define PPU_MODE_3_CYCLES 172   // Reading OAM and VRAM to generate picture
 #define PPU_MODE_0_CYCLES 204   // H-blank
 #define PPU_MODE_1_CYCLES 4560  // V-blank
+#define PPU_LINE_CYCLES 456
+#define PPU_MODE_1_BASE_LINE 144
 #define PPU_FRAME_CYCLES 70224
 
 // LCD related macros
@@ -91,53 +93,35 @@ void ppu_step(GameBoy * gameboy_ptr)
     }
     else if (STAT_MODE_3(stat_reg) && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_3_CYCLES)
     {
-        // this is bad, we should instead figure out why the emulator
         change_stat_mode(ppu_ptr, memory_map, 0);
-        
         uint8_t line_to_fill = memory_map[R_LY_ADDR];
         fill_frame_pixel_line(line_to_fill, ppu_ptr->gui_ptr, memory_map);
-        memory_map[R_LY_ADDR]++;
     }
     else if (STAT_MODE_0(stat_reg) && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_0_CYCLES)
     {
-        if ((memory_map[R_LY_ADDR] == 144 || memory_map[R_LY_ADDR] == 200) && ppu_ptr->ppu_cur_frame_clock < PPU_FRAME_CYCLES)
-        //if (false)
+        if (memory_map[R_LY_ADDR] == PPU_MODE_1_BASE_LINE - 1)
         {
-            /*
-                UGLY HACK :
-
-                This should not occur but it does for some reason (our PPU is not mode/cycle accurate).
-                As a result we opt to let cycles go by while waiting for us to hit PPU_FRAME_CYCLES.
-                
-                Since game logic will check LY = 144 in a loop (example : boot ROM regarding logo scroll)
-                to modify scroll values / update VRAM, we set the value to 200 to prevent this from happening
-                before a frame has truly been rendered. Otherwise, in two loop iterations, LY would potentially
-                still be equal to 144 and game logic would take this as 2 separate frames instead of 1.
-            */
-
-            memory_map[R_LY_ADDR] = 200;
-        }
-        else if (ppu_ptr->ppu_cur_frame_clock >= PPU_FRAME_CYCLES)
-        //else if (memory_map[R_LY_ADDR] == 144)
-        {
-            memory_map[R_LY_ADDR] = 144; // see ugly hack above, we now restore the correct value (it was potentially 200 before)
             change_stat_mode(ppu_ptr, memory_map, 1);
             gui_render_frame(ppu_ptr->gui_ptr);
-
-            memory_map[R_LY_ADDR] = 0;
-            ppu_ptr->ppu_cur_frame_clock = 0;
         }
         else
         {
             change_stat_mode(ppu_ptr, memory_map, 2);
         }
+        memory_map[R_LY_ADDR]++;
     }
-    else if (STAT_MODE_1(stat_reg) && ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_1_CYCLES)
+    else if (STAT_MODE_1(stat_reg))
     {
-        change_stat_mode(ppu_ptr, memory_map, 2);
+        if (ppu_ptr->ppu_cur_mode_clock >= PPU_MODE_1_CYCLES)
+        {
+            change_stat_mode(ppu_ptr, memory_map, 2);
+            memory_map[R_LY_ADDR] = 0;
+        }
+        else
+        {
+            memory_map[R_LY_ADDR] = PPU_MODE_1_BASE_LINE + (uint8_t) (ppu_ptr->ppu_cur_mode_clock / PPU_LINE_CYCLES);
+        }
     }
-
-    printf("ppu => step end \n");
 }
 
 void fill_frame_pixel_line(uint8_t line, Gui * gui_ptr, uint8_t * memory_map)
