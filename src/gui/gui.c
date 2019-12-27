@@ -45,8 +45,8 @@ void gui_render_frame(Gui * gui_ptr)
             uint8_t b = (gui_ptr->frame_data[i][j] == 0b10);
             uint8_t a = (gui_ptr->frame_data[i][j] == 0b11);
 
-            SDL_SetRenderDrawColor(renderer, r, g, b, a);
-            SDL_RenderDrawPoint(renderer, i, j);
+            SDL_SetRenderDrawColor(renderer, 255 * r, 255 * g, 255 * b, 255 * a);
+            SDL_RenderDrawPoint(renderer, j, i);
         }
     }
     SDL_RenderPresent(renderer);    

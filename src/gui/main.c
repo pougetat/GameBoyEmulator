@@ -6,24 +6,23 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#include "gui.h"
+
 #undef main
 
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
+int main(int argc, char* args[])
+{
+    Gui * gui_ptr = gui_init();
 
-int main(int argc, char* args[]) {
-    SDL_Window* window = NULL;
-    SDL_Surface* screenSurface = NULL;
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-    fprintf(stderr, "could not initialize sdl2: %s\n", SDL_GetError());
-    return 1;
+    for (int i = 0; i < GUI_SCREEN_PIXEL_HEIGHT; i++)
+    {
+        for (int j = 0; j < GUI_SCREEN_PIXEL_WIDTH; j++)
+        {
+            gui_ptr->frame_data[i][j] = 2;
+        }
     }
-    window = SDL_CreateWindow(
-                "hello_sdl2",
-                SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                SCREEN_WIDTH, SCREEN_HEIGHT,
-                SDL_WINDOW_SHOWN
-            );
+    gui_render_frame(gui_ptr);
+
     SDL_Event e;
     bool quit = false;
     while (!quit){
