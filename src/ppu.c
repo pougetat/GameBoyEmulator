@@ -67,6 +67,7 @@ Ppu * ppu_init()
     Ppu * ppu_ptr = malloc(sizeof(Ppu));
     ppu_ptr->ppu_cur_mode_clock = 0;
     ppu_ptr->ppu_cur_frame_clock = 0;
+    ppu_ptr->ppu_frames_rendered = 0;
     ppu_ptr->gui_ptr = gui_init();
     return ppu_ptr;
 }
@@ -103,6 +104,7 @@ void ppu_step(GameBoy * gameboy_ptr)
         {
             change_stat_mode(ppu_ptr, memory_map, 1);
             gui_render_frame(ppu_ptr->gui_ptr);
+            ppu_ptr->ppu_frames_rendered++;
         }
         else
         {
@@ -116,6 +118,7 @@ void ppu_step(GameBoy * gameboy_ptr)
         {
             change_stat_mode(ppu_ptr, memory_map, 2);
             memory_map[R_LY_ADDR] = 0;
+            ppu_ptr->ppu_cur_frame_clock = 0;
         }
         else
         {
@@ -191,6 +194,7 @@ void debug_ppu(uint8_t * memory_map, Ppu * ppu_ptr)
     printf("    ppu cur mode clock = %i \n", ppu_ptr->ppu_cur_mode_clock);
     printf("    ppu cur frame clock = %i \n", ppu_ptr->ppu_cur_frame_clock);
     printf("    ppu cur mode = %i \n", memory_map[R_STAT_ADDR] & 0b11);
+    printf("    ppu frames rendered = %i \n", ppu_ptr->ppu_frames_rendered);
     printf("    LY = %i \n", memory_map[R_LY_ADDR]);
 
     printf("\n");

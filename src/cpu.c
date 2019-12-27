@@ -71,16 +71,15 @@ void dec_rr(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr)
     }
 }
 
-// subtract registers
-/*
-void sub_r_r(uint8_t * reg1_ptr, uint8_t reg2)
+// subtract reg from register A
+void sub_a(uint8_t reg, Cpu * cpu_ptr)
 {
-    SET_H_FLAG(cpu_ptr, !WILL_BORROW_FROM_4(*reg_ptr));
-    *reg1_ptr -= reg2_ptr;
-    SET_Z_FLAG(cpu_ptr, (*reg1_ptr == 0));
+    SET_H_FLAG(cpu_ptr, !WILL_BORROW_FROM_4(cpu_ptr->regA));
+    SET_C_FLAG(cpu_ptr, cpu_ptr->regA < reg);
+    cpu_ptr->regA -= reg;
+    SET_Z_FLAG(cpu_ptr, (cpu_ptr->regA == 0));
     SET_N_FLAG(cpu_ptr, 1);
 }
-*/
 
 // register_dest <- immediate n
 void ld_r_n(uint8_t * reg_ptr, struct Cpu * cpu_ptr, uint8_t * memory_map)
@@ -382,6 +381,9 @@ void cpu_step(GameBoy * gameboy_ptr)
             break;
         case 0x78 ... 0x7D:
             ld_r_r(&(cpu_ptr->regA), *get_reg_by_num(cpu_ptr, opcode & 0b111));
+            break;
+        case 0x90 ... 0x95:
+            sub_a(*get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
             break;
         case 0xA8 ... 0xAD: 
             xor_a(*get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
