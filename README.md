@@ -49,8 +49,6 @@ More tasks will be added below as I move through the project and gain a better u
 => Elements of logo scrolling
 
 	LCD CONTROL register => 0xFF40
-	
-		Brief explanation :
 		
 			LCDC dictates bg + window display modes (on/off, where they read the data from)
 			LCDC dictates sprite mode (on/off, where the sprites are located)
@@ -60,40 +58,17 @@ More tasks will be added below as I move through the project and gain a better u
 			https://nnarain.github.io/2016/09/09/Gameboy-LCD-Controller.html
 	
 	LCD STAT register => 0xFF41
-	
-		Brief explanation :
-	
+		
 			Indicates current status of the lcd controller module in the cpu (vblank, …) and interrupt selection according to this status (LYC = LY, OAM interrupt, V-blank, H-blank)
 	
-		General design philosophy
-		
-			No need to store the current mode in the struct, simply use the MMU to set and read this register.
-			Need to implement memory protection MMU side for this specific address depending on the values
-			
-		To do items :
-		
-			0 - Implement stat_mode()
-			1 - Implement stat_match_flag()
-			2 - Implement stat_interrupt() -> returns and OR of 2 bit integers
-			
-			0 - Implement stat_set_mode() + reset_mode_clock()
-			1 - Implement stat_set_match_flag()
-			2 - Implement stat_set_interrupt()
-	
 	TASK : Implement SCY register / SCX register => 0xFF42 / 0xFF43
-	
-		Brief explanation :
 		
 			Indicates the position in the bg map that is to be displayed at the upper (SCY : 0) / left (SCX) LCD display position.
 			(values : 0 -> 255)
 			
 	TASK : Implement LY register => 0xFF44
-	
-		Brief explanation :
 			
-			Indicates the vertical line to which the present data is transferred to the LCD driver (values : 0 -> 153). 
-	
-	TASK : implement interrupt handling so that CPU can modify scroll registers during H-blank period
+			Indicates the vertical line to which the present data is transferred to the LCD driver (values : 0 -> 153).
 
 # Learning resources
 

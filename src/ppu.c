@@ -196,6 +196,5 @@ void debug_ppu(uint8_t * memory_map, Ppu * ppu_ptr)
     printf("    ppu cur mode = %i \n", memory_map[R_STAT_ADDR] & 0b11);
     printf("    ppu frames rendered = %i \n", ppu_ptr->ppu_frames_rendered);
     printf("    LY = %i \n", memory_map[R_LY_ADDR]);
-
     printf("\n");
 }
