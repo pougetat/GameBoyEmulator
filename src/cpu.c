@@ -189,33 +189,44 @@ void jr_z_sn(struct Cpu * cpu_ptr, uint8_t * memory_map)
     }    
 }
 
+// jump to immediate 16 byte address
 void jr_nn(Cpu * cpu_ptr, uint8_t * memory_map)
 {
     cpu_ptr->regPC = mmu_fetch_16bit_val(memory_map, cpu_ptr->regPC);
 }
 
 // jump
-void jr_sn(struct Cpu * cpu_ptr, uint8_t * memory_map)
+void jr_sn(Cpu * cpu_ptr, uint8_t * memory_map)
 {
     cpu_ptr->regPC += mmu_fetch_signed_8bit_val(memory_map, cpu_ptr->regPC);
 }
 
 // xor reg with register A
-void xor_a(uint8_t reg, struct Cpu * cpu_ptr)
+void xor_a(uint8_t reg, Cpu * cpu_ptr)
 {
     cpu_ptr->regA ^= reg;
-    SET_Z_FLAG(cpu_ptr, (cpu_ptr->regA == 0)); \
-    SET_N_FLAG(cpu_ptr, 0); \
-    SET_H_FLAG(cpu_ptr, 0); \
-    SET_C_FLAG(cpu_ptr, 0); \
+    SET_Z_FLAG(cpu_ptr, (cpu_ptr->regA == 0));
+    SET_N_FLAG(cpu_ptr, 0);
+    SET_H_FLAG(cpu_ptr, 0);
+    SET_C_FLAG(cpu_ptr, 0);
+}
+
+// or reg with register A
+void or_a(uint8_t reg, Cpu * cpu_ptr)
+{
+    cpu_ptr->regA |= reg;
+    SET_Z_FLAG(cpu_ptr, (cpu_ptr->regA == 0));
+    SET_N_FLAG(cpu_ptr, 0);
+    SET_H_FLAG(cpu_ptr, 0);
+    SET_C_FLAG(cpu_ptr, 0);
 }
 
 // compare register A with value
-void cp_a(uint8_t value, struct Cpu * cpu_ptr)
+void cp_a(uint8_t value, Cpu * cpu_ptr)
 {
-    SET_Z_FLAG(cpu_ptr, (cpu_ptr->regA == value)); \
-    SET_N_FLAG(cpu_ptr, 1); \
-    SET_H_FLAG(cpu_ptr, (int) (cpu_ptr->regA & 0xf) < (int) (value & 0xf)); \
+    SET_Z_FLAG(cpu_ptr, (cpu_ptr->regA == value));
+    SET_N_FLAG(cpu_ptr, 1);
+    SET_H_FLAG(cpu_ptr, (int) (cpu_ptr->regA & 0xf) < (int) (value & 0xf));
     SET_C_FLAG(cpu_ptr, (int) cpu_ptr->regA < (int) value);
 }
 
@@ -479,6 +490,9 @@ void cpu_step(GameBoy * gameboy_ptr)
             break;
         case 0xAF:
             xor_a(cpu_ptr->regA, cpu_ptr);
+            break;
+        case 0xB0 ... 0xB5:
+            or_a(*get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
             break;
         case 0xB8:
             cp_a(cpu_ptr->regB, cpu_ptr);
