@@ -415,6 +415,30 @@ void cpu_step(GameBoy * gameboy_ptr)
         case 0xAF:
             xor_a(cpu_ptr->regA, cpu_ptr);
             break;
+        case 0xB8:
+            cp_a(cpu_ptr->regB, cpu_ptr);
+            break;
+        case 0xB9:
+            cp_a(cpu_ptr->regC, cpu_ptr);
+            break;
+        case 0xBA:
+            cp_a(cpu_ptr->regD, cpu_ptr);
+            break;
+        case 0xBB:
+            cp_a(cpu_ptr->regE, cpu_ptr);
+            break;
+        case 0xBC:
+            cp_a(cpu_ptr->regH, cpu_ptr);
+            break;
+        case 0xBD:
+            cp_a(cpu_ptr->regL, cpu_ptr);
+            break;
+        case 0xBE:
+            cp_a(memory_map[REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL)], cpu_ptr);
+            break;
+        case 0xBF:
+            cp_a(cpu_ptr->regA, cpu_ptr);
+            break;
         case 0xC1:
             pop_rr(&(cpu_ptr->regB), &(cpu_ptr->regC), cpu_ptr, memory_map);
             break;
@@ -489,6 +513,7 @@ void cpu_step(GameBoy * gameboy_ptr)
             break;
 
         default:
+            debug_cpu(memory_map, cpu_ptr);
             printf("Instruction not implemented \n");
             printf("%i \n", 0/0);
             break;
