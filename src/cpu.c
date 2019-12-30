@@ -187,13 +187,25 @@ void cp_a(uint8_t value, struct Cpu * cpu_ptr)
     SET_C_FLAG(cpu_ptr, (int) cpu_ptr->regA < (int) value);
 }
 
-// rotate register left
+// rotate register left through carry
 void rl_r(uint8_t * reg_ptr, struct Cpu * cpu_ptr)
 {
     uint8_t left_most_bit = (*reg_ptr) >> 7;
     *reg_ptr = ((*reg_ptr) << 1) | read_c_flag(cpu_ptr);
 
     SET_Z_FLAG(cpu_ptr, (*reg_ptr == 0));
+    SET_N_FLAG(cpu_ptr, 0);
+    SET_H_FLAG(cpu_ptr, 0);
+    SET_C_FLAG(cpu_ptr, left_most_bit);
+}
+
+// rotate register A left through carry
+void rla(Cpu * cpu_ptr)
+{
+    uint8_t left_most_bit = cpu_ptr->regA >> 7;
+    cpu_ptr->regA = (cpu_ptr->regA << 1) | read_c_flag(cpu_ptr);
+
+    SET_Z_FLAG(cpu_ptr, (cpu_ptr->regA == 0));
     SET_N_FLAG(cpu_ptr, 0);
     SET_H_FLAG(cpu_ptr, 0);
     SET_C_FLAG(cpu_ptr, left_most_bit);
@@ -231,11 +243,11 @@ void push_rr(uint8_t reg_high, uint8_t reg_low, struct Cpu * cpu_ptr, uint8_t * 
     cpu_ptr->regSP--;
 }
 
-void pop_rr(uint8_t reg_high, uint8_t reg_low, struct Cpu * cpu_ptr, uint8_t * memory_map)
+void pop_rr(uint8_t * reg_high, uint8_t * reg_low, struct Cpu * cpu_ptr, uint8_t * memory_map)
 {
     cpu_ptr->regSP++;
-    reg_high = mmu_fetch_16bit_val(memory_map, cpu_ptr->regSP) >> 8;
-    reg_low = mmu_fetch_16bit_val(memory_map, cpu_ptr->regSP) & 0xFF;
+    *reg_high = mmu_fetch_16bit_val(memory_map, cpu_ptr->regSP) >> 8;
+    *reg_low = mmu_fetch_16bit_val(memory_map, cpu_ptr->regSP) & 0xFF;
     cpu_ptr->regSP++;
 }
 
@@ -305,7 +317,7 @@ void cpu_step(GameBoy * gameboy_ptr)
             cpu_ptr->regPC++;
             break;
         case 0x17:
-            rl_r(&(cpu_ptr->regA), cpu_ptr);
+            rla(cpu_ptr);
             break;
         case 0x18:
             jr_sn(cpu_ptr, memory_map);
@@ -404,7 +416,7 @@ void cpu_step(GameBoy * gameboy_ptr)
             xor_a(cpu_ptr->regA, cpu_ptr);
             break;
         case 0xC1:
-            pop_rr(cpu_ptr->regB, cpu_ptr->regC, cpu_ptr, memory_map);
+            pop_rr(&(cpu_ptr->regB), &(cpu_ptr->regC), cpu_ptr, memory_map);
             break;
         case 0xC5:
             push_rr(cpu_ptr->regB, cpu_ptr->regC, cpu_ptr, memory_map);
