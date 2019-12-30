@@ -26,7 +26,7 @@ void gameboy_setup_boot(GameBoy * gameboy_ptr)
 
 void gameboy_read_rom(GameBoy * gameboy_ptr, FILE * rom_file)
 {
-    mmu_read_rom(gameboy_ptr->mmu_ptr, rom_file, 0x104);
+    mmu_read_rom(gameboy_ptr->mmu_ptr, rom_file, 0x100);
 }
 
 void gameboy_run(GameBoy * gameboy_ptr)

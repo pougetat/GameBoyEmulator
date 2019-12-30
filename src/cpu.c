@@ -182,6 +182,11 @@ void jr_z_sn(struct Cpu * cpu_ptr, uint8_t * memory_map)
     }    
 }
 
+void jr_nn(Cpu * cpu_ptr, uint8_t * memory_map)
+{
+    cpu_ptr->regPC = mmu_fetch_16bit_val(memory_map, cpu_ptr->regPC);
+}
+
 // jump
 void jr_sn(struct Cpu * cpu_ptr, uint8_t * memory_map)
 {
@@ -271,6 +276,9 @@ void pop_rr(uint8_t * reg_high, uint8_t * reg_low, struct Cpu * cpu_ptr, uint8_t
     cpu_ptr->regSP++;
 }
 
+// Disable interrupts (after the instruction executed after ldi)
+void ldi(){}
+
 /*
     An 8 bit opcode can be broken down in the following way :
     [ 7, 6, 5, 4, 3, 2, 1, 0]
@@ -281,7 +289,6 @@ void cpu_step(GameBoy * gameboy_ptr)
 {
     Cpu * cpu_ptr = gameboy_ptr->cpu_ptr;
     uint8_t * memory_map = gameboy_ptr->mmu_ptr->memory_map;
-
     uint8_t opcode = memory_map[cpu_ptr->regPC++];
 
     switch (opcode)
@@ -398,6 +405,8 @@ void cpu_step(GameBoy * gameboy_ptr)
         case 0x32:
             ldd_addr_r(&(cpu_ptr->regH), &(cpu_ptr->regL), cpu_ptr->regA, memory_map);
             break;
+        case 0x36:
+            break;
         case 0x3C:
             inc_r(&(cpu_ptr->regA), cpu_ptr);
             break;
@@ -416,6 +425,9 @@ void cpu_step(GameBoy * gameboy_ptr)
             break;
         case 0x67:
             ld_r_r(&(cpu_ptr->regH), cpu_ptr->regA);
+            break;
+        case 0x70 ... 0x75:
+            ld_addr_r(REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL), *get_reg_by_num(cpu_ptr, opcode & 0xF), memory_map);
             break;
         case 0x77:
             ld_addr_r(REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL), cpu_ptr->regA, memory_map);
@@ -471,6 +483,9 @@ void cpu_step(GameBoy * gameboy_ptr)
         case 0xC1:
             pop_rr(&(cpu_ptr->regB), &(cpu_ptr->regC), cpu_ptr, memory_map);
             break;
+        case 0xC3:
+            jr_nn(cpu_ptr, memory_map);
+            break;
         case 0xC5:
             push_rr(cpu_ptr->regB, cpu_ptr->regC, cpu_ptr, memory_map);
             break;
@@ -498,6 +513,9 @@ void cpu_step(GameBoy * gameboy_ptr)
             break;
         case 0xF2:
             ld_r_addr(&(cpu_ptr->regA), 0xFF00 + (uint16_t) cpu_ptr->regC, memory_map);
+            break;
+        case 0xF3:
+            ldi();
             break;
         case 0xFE:
             cp_a(memory_map[cpu_ptr->regPC], cpu_ptr);
