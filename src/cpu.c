@@ -145,6 +145,13 @@ void ld_r_addr(uint8_t * reg_ptr, memory_addr address, uint8_t * memory_map)
     *reg_ptr = memory_map[address];
 }
 
+// register <- (address); increment register pair
+void ldi_r_addr(uint8_t * reg_dest_ptr, uint8_t * reg_high_ptr, uint8_t * reg_low_ptr, uint8_t * memory_map)
+{
+    ld_r_addr(reg_dest_ptr, REG_PAIR_VAL(*reg_high_ptr, *reg_low_ptr), memory_map);
+    inc_rr(reg_high_ptr, reg_low_ptr);
+}
+
 // (address) <- register; increment register pair
 void ldi_addr_r(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr, uint8_t reg_src, uint8_t * memory_map)
 {
@@ -391,6 +398,9 @@ void cpu_step(GameBoy * gameboy_ptr)
             jr_z_sn(cpu_ptr, memory_map);
             cpu_ptr->regPC++;
             break;
+        case 0x2A:
+            ldi_r_addr(&(cpu_ptr->regA), &(cpu_ptr->regH), &(cpu_ptr->regL), memory_map);
+            break;
         case 0x2D:
             dec_r(&(cpu_ptr->regL), cpu_ptr);
             break;
@@ -406,6 +416,8 @@ void cpu_step(GameBoy * gameboy_ptr)
             ldd_addr_r(&(cpu_ptr->regH), &(cpu_ptr->regL), cpu_ptr->regA, memory_map);
             break;
         case 0x36:
+            ld_addr_r(REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL), memory_map[cpu_ptr->regPC], memory_map);
+            cpu_ptr->regPC++;
             break;
         case 0x3C:
             inc_r(&(cpu_ptr->regA), cpu_ptr);
@@ -417,7 +429,7 @@ void cpu_step(GameBoy * gameboy_ptr)
             ld_r_n(&(cpu_ptr->regA), cpu_ptr, memory_map);                        
             cpu_ptr->regPC++;
             break;
-        case 0x4F: // ld c a
+        case 0x4F:
             ld_r_r(&(cpu_ptr->regC), cpu_ptr->regA);
             break;
         case 0x57:
