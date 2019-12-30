@@ -23,6 +23,7 @@ This milestone has been reached. We can now scroll the Nintendo logo on to the s
 
 * TASK [test]: verify VRAM data for logo scroll
 
+```
 	8000: 00000000000000000000000000000000
 	8010: F000F000FC00FC00FC00FC00F300F300
 	8020: 3C003C003C003C003C003C003C003C00
@@ -50,6 +51,7 @@ This milestone has been reached. We can now scroll the Nintendo logo on to the s
 	8180: 0F000F000F000F000F000F00FC00FC00
 
 	8190: 3C004200B900A500B900A50042003C00 -> copyright logo
+```
 
 ## Milestone 2 : Run through the entire boot process
 
