@@ -55,6 +55,11 @@ This milestone has been reached. We can now scroll the Nintendo logo on to the s
 
 ## Milestone 2 : Run through the entire boot process
 
+This milestone has been completed. We now run through the entire boot sequence with the logo check working properly.
+We can now move on to testing on simple ROMs.
+
+### Work to be done
+
 * TASK : implement LD instructions
 * TASK : implement XOR instructions
 * TASK : implement BIT instructions
@@ -72,6 +77,11 @@ This milestone has been reached. We can now scroll the Nintendo logo on to the s
 * TASK : implement RET instructions
 * TASK : implement JR NZ instructions
 * TASK : implement ADD instructions
+
+## Milestone 3 : Run a simple game with joypad input
+
+* TASK : Find simple ROM specifications that we would like to run and determine system requirements
+* TASK : Understand joypad input requirements (perhaps some interrupts need to be implemented)
 
 # Learning resources
 
