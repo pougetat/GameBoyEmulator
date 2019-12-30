@@ -10,11 +10,11 @@ I will use this README to track my progress on my gameboy emulator project. The 
 
 More tasks will be added below as I move through the project and gain a better understanding of the system going from the general flow right down to the last detail.
 
-# Milestone 1 : Scrolling the Nintendo logo (running the boot ROM) [COMPLETE]
+## Milestone 1 : Scrolling the Nintendo logo (running the boot ROM)
 
 	This milestone has been reached. We can now scroll the Nintendo logo on to the screen. The tasks below are some suggested improvements for this stage.
 
-## Work to be done
+### Work to be done
 
 	TASK [cleanup]: move CPU macros into c file and change them into functions
 	TASK [cleanup]: make CPU registers pointers to integers
@@ -50,7 +50,7 @@ More tasks will be added below as I move through the project and gain a better u
 
 		8190: 3C004200B900A500B900A50042003C00 -> copyright logo
 
-# Milestone 2 : Run through the entire boot process
+## Milestone 2 : Run through the entire boot process
 
 	TASK : implement LD instructions
 	TASK : implement XOR instructions
