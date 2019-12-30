@@ -192,7 +192,6 @@ void jr_z_sn(struct Cpu * cpu_ptr, uint8_t * memory_map)
 // jump to immediate 16 byte address
 void jr_nn(Cpu * cpu_ptr, uint8_t * memory_map)
 {
-    printf("immediate address = 0x%x \n", mmu_fetch_16bit_val(memory_map, cpu_ptr->regPC));
     cpu_ptr->regPC = mmu_fetch_16bit_val(memory_map, cpu_ptr->regPC);
 }
 
