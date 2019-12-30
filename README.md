@@ -16,12 +16,13 @@ This milestone has been reached. We can now scroll the Nintendo logo on to the s
 
 ### Work to be done
 
-TASK [cleanup]: move CPU macros into c file and change them into functions
-TASK [cleanup]: make CPU registers pointers to integers
-TASK [cleanup]: Improvements can be made to the makefile by looking at standard makefiles
-TASK [cleanup]: make header files follow the same format (include order, external APIs prefixed but not internal APIs)
+* TASK [cleanup]: move CPU macros into c file and change them into functions
+* TASK [cleanup]: make CPU registers pointers to integers
+* TASK [cleanup]: Improvements can be made to the makefile by looking at standard makefiles
+* TASK [cleanup]: make header files follow the same format (include order, external APIs prefixed but not internal APIs)
 
-TASK [test]: verify VRAM data for logo scroll
+* TASK [test]: verify VRAM data for logo scroll
+
 	8000: 00000000000000000000000000000000
 	8010: F000F000FC00FC00FC00FC00F300F300
 	8020: 3C003C003C003C003C003C003C003C00
@@ -52,23 +53,23 @@ TASK [test]: verify VRAM data for logo scroll
 
 ## Milestone 2 : Run through the entire boot process
 
-TASK : implement LD instructions
-TASK : implement XOR instructions
-TASK : implement BIT instructions
-TASK : implement JR instructions
-TASK : implement INC instructions
-TASK : implement CALL instructions
-TASK : implement CP instructions
-TASK : implement JR instructions
-TASK : implement DEC instructions
-TASK : implement SUB instructions
-TASK : implement PUSH instructions
-TASK : implement RL instructions
-TASK : implement RLA instructions
-TASK : implement POP instructions
-TASK : implement RET instructions
-TASK : implement JR NZ instructions
-TASK : implement ADD instructions
+* TASK : implement LD instructions
+* TASK : implement XOR instructions
+* TASK : implement BIT instructions
+* TASK : implement JR instructions
+* TASK : implement INC instructions
+* TASK : implement CALL instructions
+* TASK : implement CP instructions
+* TASK : implement JR instructions
+* TASK : implement DEC instructions
+* TASK : implement SUB instructions
+* TASK : implement PUSH instructions
+* TASK : implement RL instructions
+* TASK : implement RLA instructions
+* TASK : implement POP instructions
+* TASK : implement RET instructions
+* TASK : implement JR NZ instructions
+* TASK : implement ADD instructions
 
 # Learning resources
 
