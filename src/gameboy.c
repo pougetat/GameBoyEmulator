@@ -18,14 +18,20 @@ GameBoy * gameboy_init()
     return gameboy_ptr;
 }
 
+void gameboy_setup_boot(GameBoy * gameboy_ptr)
+{
+    FILE * bootrom_file = fopen("../testRoms/simple.gb", "r");
+    mmu_read_rom(gameboy_ptr->mmu_ptr, bootrom_file, 0);
+}
+
 void gameboy_read_rom(GameBoy * gameboy_ptr, FILE * rom_file)
 {
-    mmu_read_rom(gameboy_ptr->mmu_ptr, rom_file);
+    mmu_read_rom(gameboy_ptr->mmu_ptr, rom_file, 0x104);
 }
 
 void gameboy_run(GameBoy * gameboy_ptr)
 {
-    //while (gameboy_ptr->cpu_ptr->regPC != 0xA0)
+    //while (gameboy_ptr->cpu_ptr->regPC != 0xFA)
     while (true)
     {
         cpu_step(gameboy_ptr);

@@ -17,6 +17,7 @@ typedef struct GameBoy {
 } GameBoy;
 
 GameBoy * gameboy_init();
+void gameboy_setup_boot(GameBoy * gameboy);
 void gameboy_read_rom(GameBoy * gameboy, FILE * rom_file);
 void gameboy_run(GameBoy * gameboy);
 uint8_t gameboy_prev_executed_cycles(GameBoy * gameboy);

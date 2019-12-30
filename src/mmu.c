@@ -15,16 +15,18 @@ Mmu * mmu_init()
     return mmu;
 }
 
-void mmu_read_rom(struct Mmu * mmu, FILE * rom_file)
+void mmu_read_rom(struct Mmu * mmu, FILE * rom_file, memory_addr start_address)
 {
     int byte;
-    uint16_t cur_pos = 0;
+    uint16_t cur_pos = start_address;
+    for (memory_addr addr = 0; addr < start_address; addr++)
+    {
+        fgetc(rom_file);
+    }
     while ((byte = fgetc(rom_file)) != EOF & cur_pos < MAX_ROM_SIZE)
     {
         mmu->memory_map[cur_pos++] = (uint8_t) byte;
     }
-    // This will be removed in the future
-    mmu_add_cartridge_logo(mmu->memory_map);
     fclose(rom_file);
 }
 

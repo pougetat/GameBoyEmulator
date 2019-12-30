@@ -24,7 +24,7 @@ typedef struct Mmu {
 #define R_BGP_ADDR 0xFF47  // BG Palette Data (W)
 
 Mmu * mmu_init();
-void mmu_read_rom(struct Mmu * mmu, FILE * rom_file);
+void mmu_read_rom(struct Mmu * mmu, FILE * rom_file, memory_addr start_address);
 void mmu_step(GameBoy * gameboy_ptr);
 
 uint16_t mmu_fetch_16bit_val(uint8_t * memory_map, memory_addr address);
