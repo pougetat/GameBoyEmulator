@@ -25,7 +25,7 @@ void gameboy_read_rom(GameBoy * gameboy_ptr, FILE * rom_file)
 
 void gameboy_run(GameBoy * gameboy_ptr)
 {
-    // while (gameboy_ptr->cpu_ptr->regPC != 0x64)
+    //while (gameboy_ptr->cpu_ptr->regPC != 0xA0)
     while (true)
     {
         cpu_step(gameboy_ptr);

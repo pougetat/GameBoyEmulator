@@ -20,6 +20,13 @@ struct Cpu * cpu_init()
     return cpu_ptr;
 }
 
+// CPU helper functions
+
+uint8_t read_c_flag(Cpu * cpu_ptr)
+{
+    return ((cpu_ptr->FLAG >> 4) & 0b1);
+}
+
 /* CPU instructions */
 
 // NOP
@@ -183,11 +190,13 @@ void cp_a(uint8_t value, struct Cpu * cpu_ptr)
 // rotate register left
 void rl_r(uint8_t * reg_ptr, struct Cpu * cpu_ptr)
 {
-    SET_Z_FLAG(cpu_ptr, (*reg_ptr << 1 == 0));
+    uint8_t left_most_bit = (*reg_ptr) >> 7;
+    *reg_ptr = ((*reg_ptr) << 1) | read_c_flag(cpu_ptr);
+
+    SET_Z_FLAG(cpu_ptr, (*reg_ptr == 0));
     SET_N_FLAG(cpu_ptr, 0);
     SET_H_FLAG(cpu_ptr, 0);
-    SET_C_FLAG(cpu_ptr, (*reg_ptr & 0x10000000) >> 7);
-    *reg_ptr = *reg_ptr << 1; 
+    SET_C_FLAG(cpu_ptr, left_most_bit);
 }
 
 // Z <- TEST_BIT_IS_0(bit_num, register)
