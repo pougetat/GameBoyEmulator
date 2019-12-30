@@ -156,8 +156,8 @@ uint8_t get_tile_pixel(uint8_t tile_offset_x, uint8_t tile_offset_y, uint8_t * t
 {
     // explanation here => https://www.huderlem.com/demos/gameboy2bpp.html
 
-    uint8_t pixel_bit_high = (tile_data_addr[tile_offset_y * 2] & (0b10000000 >> tile_offset_x)) >> (TILE_PIXEL_WIDTH - tile_offset_x);
-    uint8_t pixel_bit_low = (tile_data_addr[tile_offset_y * 2 + 1] & (0b10000000 >> tile_offset_x)) >> (TILE_PIXEL_WIDTH - tile_offset_x);
+    uint8_t pixel_bit_low = (tile_data_addr[tile_offset_y * 2] & (0b10000000 >> tile_offset_x)) >> (TILE_PIXEL_WIDTH - tile_offset_x - 1);
+    uint8_t pixel_bit_high = (tile_data_addr[tile_offset_y * 2 + 1] & (0b10000000 >> tile_offset_x)) >> (TILE_PIXEL_WIDTH - tile_offset_x - 1);
     return (pixel_bit_high << 1) | pixel_bit_low;
 }
 
