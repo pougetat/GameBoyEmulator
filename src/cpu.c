@@ -27,6 +27,16 @@ uint8_t read_c_flag(Cpu * cpu_ptr)
     return ((cpu_ptr->FLAG >> 4) & 0b1);
 }
 
+bool will_carry_3_to_4(uint8_t value1, uint8_t value2)
+{
+    return (value1 & 0b1111) + (value2 & 0b1111) >= 0b10000;
+}
+
+bool will_carry_7_to_8(uint8_t value1, uint8_t value2)
+{
+    return (uint16_t) ((uint16_t) value1 + (uint16_t) value2) >= 0b100000000;
+}
+
 /* CPU instructions */
 
 // NOP
@@ -76,6 +86,16 @@ void dec_rr(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr)
     {
         (*reg_low_ptr)--;
     }
+}
+
+// add reg to register A
+void add_a(uint8_t value, Cpu * cpu_ptr)
+{
+    SET_H_FLAG(cpu_ptr, will_carry_3_to_4(cpu_ptr->regA, value))
+    SET_C_FLAG(cpu_ptr, will_carry_7_to_8(cpu_ptr->regA, value))
+    cpu_ptr->regA += value;
+    SET_Z_FLAG(cpu_ptr, (cpu_ptr->regA == 0));
+    SET_N_FLAG(cpu_ptr, 0);
 }
 
 // subtract reg from register A
@@ -402,6 +422,15 @@ void cpu_step(GameBoy * gameboy_ptr)
             break;
         case 0x78 ... 0x7D:
             ld_r_r(&(cpu_ptr->regA), *get_reg_by_num(cpu_ptr, opcode & 0b111));
+            break;
+        case 0x80 ... 0x85:
+            add_a(*get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
+            break;
+        case 0x86:
+            add_a(memory_map[REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL)], cpu_ptr);
+            break;
+        case 0x87:
+            add_a(cpu_ptr->regA, cpu_ptr);
             break;
         case 0x90 ... 0x95:
             sub_a(*get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
