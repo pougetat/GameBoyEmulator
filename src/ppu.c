@@ -53,6 +53,8 @@
 #define BG_TILES_PER_ROW 32
 #define BG_TILES_PER_COLUMN 32
 
+#define TILE_DATA_SIZE 16
+
 // Functions used in this file
 
 void fill_frame_pixel_line(uint8_t line, Gui * gui_ptr, uint8_t * memory_map);
@@ -74,11 +76,9 @@ Ppu * ppu_init()
 
 void ppu_step(GameBoy * gameboy_ptr)
 {
-    printf("ppu => step start \n");
-    
     uint8_t * memory_map = gameboy_ptr->mmu_ptr->memory_map;
     Ppu * ppu_ptr = gameboy_ptr->ppu_ptr;
-    debug_ppu(memory_map, ppu_ptr);
+    //debug_ppu(memory_map, ppu_ptr);
 
     if (!LCDC_DISPLAY_ENABLED(memory_map[R_LCDC_ADDR]))
     {
@@ -144,15 +144,18 @@ uint8_t * get_tile_data_addr(uint8_t cur_x, uint8_t cur_y, uint8_t * memory_map)
     // been chosen and fetching the correct tile data address
 
     uint8_t * bg_tilemap = memory_map + 0x9800;
-    uint8_t * bg_tileset = memory_map + 0x9000;
+    uint8_t * bg_tileset = memory_map + 0x8000;
     uint8_t tile_line = (uint8_t) (cur_y /  TILE_PIXEL_HEIGHT);
     uint8_t tile_column = (uint8_t) (cur_x / TILE_PIXEL_WIDTH);
-    return bg_tileset + bg_tilemap[BG_TILES_PER_ROW * tile_line + tile_column];
+    uint8_t tile_num = bg_tilemap[BG_TILES_PER_ROW * tile_line + tile_column];
+
+    return bg_tileset + tile_num * TILE_DATA_SIZE;
 }
 
 uint8_t get_tile_pixel(uint8_t tile_offset_x, uint8_t tile_offset_y, uint8_t * tile_data_addr)
 {
     // explanation here => https://www.huderlem.com/demos/gameboy2bpp.html
+
     uint8_t pixel_bit_high = (tile_data_addr[tile_offset_y * 2] & (0b10000000 >> tile_offset_x)) >> (TILE_PIXEL_WIDTH - tile_offset_x);
     uint8_t pixel_bit_low = (tile_data_addr[tile_offset_y * 2 + 1] & (0b10000000 >> tile_offset_x)) >> (TILE_PIXEL_WIDTH - tile_offset_x);
     return (pixel_bit_high << 1) | pixel_bit_low;
@@ -197,4 +200,25 @@ void debug_ppu(uint8_t * memory_map, Ppu * ppu_ptr)
     printf("    ppu frames rendered = %i \n", ppu_ptr->ppu_frames_rendered);
     printf("    LY = %i \n", memory_map[R_LY_ADDR]);
     printf("\n");
+}
+
+void debug_ppu_frame(uint8_t * memory_map)
+{
+    printf("Tile set memory values \n");
+    for (uint16_t i = 0x8000; i < 0x97FF; i++)
+    {
+        if (memory_map[i] != 0)
+        {
+            printf("memory_map[%x] = %x \n", i, memory_map[i]);
+        }
+    }
+
+    printf("Tile map memory values \n");
+    for (uint16_t i = 0x9800; i < 0x9FFF; i++)
+    {
+        if (memory_map[i] != 0)
+        {
+            printf("memory_map[%x] = %x \n", i, memory_map[i]);
+        }
+    }
 }

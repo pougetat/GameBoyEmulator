@@ -186,7 +186,7 @@ void rl_r(uint8_t * reg_ptr, struct Cpu * cpu_ptr)
     SET_Z_FLAG(cpu_ptr, (*reg_ptr << 1 == 0));
     SET_N_FLAG(cpu_ptr, 0);
     SET_H_FLAG(cpu_ptr, 0);
-    SET_C_FLAG(cpu_ptr, *reg_ptr >> 7 & 0x1);
+    SET_C_FLAG(cpu_ptr, (*reg_ptr & 0x10000000) >> 7);
     *reg_ptr = *reg_ptr << 1; 
 }
 
@@ -474,7 +474,7 @@ void cpu_step(GameBoy * gameboy_ptr)
     }
 
     cpu_ptr->prev_instruction_cycles = 4; // this will be changed
-    debug_cpu(memory_map, cpu_ptr);
+    //debug_cpu(memory_map, cpu_ptr);
 }
 
 uint8_t * get_reg_by_num(struct Cpu * cpu_ptr, uint8_t reg_num)
