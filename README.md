@@ -102,3 +102,5 @@ https://realboyemulator.wordpress.com/2013/01/03/a-look-at-the-game-boy-bootstra
 
 Once I am done I can look at the following emulators (NOT BEFORE) : 
 https://github.com/binji/binjgb
+
+line 5624 in tetris.asm

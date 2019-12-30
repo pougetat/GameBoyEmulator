@@ -5,7 +5,7 @@
 #include "stdio.h"
 
 #define MEMORY_MAP_SIZE 65536 // 0x0000 - 0xFFFF
-#define MAX_ROM_SIZE 16384 // 0x0000 - 0x3FFF (only handling 32 KB roms for now)
+#define MAX_ROM_SIZE 32768 // (only handling 32 KB roms for now)
 
 Mmu * mmu_init()
 {
@@ -15,7 +15,7 @@ Mmu * mmu_init()
     return mmu;
 }
 
-void mmu_read_rom(struct Mmu * mmu, FILE * rom_file, memory_addr start_address)
+void mmu_read_rom(Mmu * mmu, FILE * rom_file, memory_addr start_address)
 {
     int byte;
     uint16_t cur_pos = start_address;
