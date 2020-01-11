@@ -242,6 +242,18 @@ void rl_r(uint8_t * reg_ptr, struct Cpu * cpu_ptr)
     SET_C_FLAG(cpu_ptr, left_most_bit);
 }
 
+// rotate register A left, old 7 bit to carry flag
+void rlca(Cpu * cpu_ptr)
+{
+    uint8_t left_most_bit = cpu_ptr->regA >> 7;
+    cpu_ptr->regA = (cpu_ptr->regA << 1) | left_most_bit;
+
+    SET_Z_FLAG(cpu_ptr, (cpu_ptr->regA == 0));
+    SET_N_FLAG(cpu_ptr, 0);
+    SET_H_FLAG(cpu_ptr, 0);
+    SET_C_FLAG(cpu_ptr, left_most_bit);
+}
+
 // rotate register A left through carry
 void rla(Cpu * cpu_ptr)
 {
@@ -294,8 +306,10 @@ void pop_rr(uint8_t * reg_high, uint8_t * reg_low, struct Cpu * cpu_ptr, uint8_t
     cpu_ptr->regSP++;
 }
 
-// Disable interrupts (after the instruction executed after ldi)
-void ldi(){}
+// Disable interrupts (after the instruction executed after di)
+void di(){}
+
+void ei(){}
 
 /*
     An 8 bit opcode can be broken down in the following way :
@@ -333,6 +347,15 @@ void cpu_step(GameBoy * gameboy_ptr)
         case 0x06:
             ld_r_n(&(cpu_ptr->regB), cpu_ptr, memory_map);
             cpu_ptr->regPC++;
+            break;
+        case 0x07:
+            rlca(cpu_ptr);
+            break;
+        case 0x08:
+            ld_addr_r(mmu_fetch_16bit_val(memory_map, cpu_ptr->regPC), cpu_ptr->regPC, memory_map);
+            cpu_ptr->regPC++;
+            cpu_ptr->regPC++;
+            break;
             break;
         case 0x0B:
             dec_rr(&(cpu_ptr->regB), &(cpu_ptr->regC));
@@ -553,7 +576,10 @@ void cpu_step(GameBoy * gameboy_ptr)
             ld_r_addr(&(cpu_ptr->regA), 0xFF00 + (uint16_t) cpu_ptr->regC, memory_map);
             break;
         case 0xF3:
-            ldi();
+            di();
+            break;
+        case 0xFB:
+            ei();
             break;
         case 0xFE:
             cp_a(memory_map[cpu_ptr->regPC], cpu_ptr);
