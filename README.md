@@ -12,7 +12,13 @@ More tasks will be added below as I move through the project and gain a better u
 
 ## Build and run instructions
 
-If on linux you can do the following :
+If you are running linux you should first download the SDL2 library with the following command :
+
+```
+sudo apt-get install libsdl2-dev
+```
+
+Then run the following command to build and run the emulator (the tetris ROM is currently loaded by default) :
 
 ```
 make build-linux && cd src/ && emulator.exe
