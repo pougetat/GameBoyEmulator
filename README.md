@@ -10,6 +10,14 @@ I will use this README to track my progress on my gameboy emulator project. The 
 
 More tasks will be added below as I move through the project and gain a better understanding of the system going from the general flow right down to the last detail.
 
+## Build and run instructions
+
+If on linux you can do the following :
+
+```
+make build-linux && cd src/ && emulator.exe
+```
+
 ## Milestone 1 : Scrolling the Nintendo logo (running the boot ROM)
 
 This milestone has been reached. We can now scroll the Nintendo logo on to the screen. The tasks below are some suggested improvements for this stage.
