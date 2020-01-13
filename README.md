@@ -30,11 +30,6 @@ This milestone has been reached. We can now scroll the Nintendo logo on to the s
 
 ### Work to be done
 
-* TASK [cleanup]: move CPU macros into c file and change them into functions
-* TASK [cleanup]: make CPU registers pointers to integers
-* TASK [cleanup]: Improvements can be made to the makefile by looking at standard makefiles
-* TASK [cleanup]: make header files follow the same format (include order, external APIs prefixed but not internal APIs)
-
 * TASK [test]: verify VRAM data for logo scroll
 
 ```
@@ -72,30 +67,19 @@ This milestone has been reached. We can now scroll the Nintendo logo on to the s
 This milestone has been completed. We now run through the entire boot sequence with the logo check working properly.
 We can now move on to testing on simple ROMs.
 
-### Work to be done
-
-* TASK : implement LD instructions
-* TASK : implement XOR instructions
-* TASK : implement BIT instructions
-* TASK : implement JR instructions
-* TASK : implement INC instructions
-* TASK : implement CALL instructions
-* TASK : implement CP instructions
-* TASK : implement JR instructions
-* TASK : implement DEC instructions
-* TASK : implement SUB instructions
-* TASK : implement PUSH instructions
-* TASK : implement RL instructions
-* TASK : implement RLA instructions
-* TASK : implement POP instructions
-* TASK : implement RET instructions
-* TASK : implement JR NZ instructions
-* TASK : implement ADD instructions
-
 ## Milestone 3 : Run a simple game with joypad input
 
-* TASK : Find simple ROM specifications that we would like to run and determine system requirements
-* TASK : Understand joypad input requirements (perhaps some interrupts need to be implemented)
+* TASK [cleanup]: move CPU macros into c file and change them into functions
+* TASK [cleanup]: make CPU registers pointers to integers
+* TASK [cleanup]: Improvements can be made to the makefile by looking at standard makefiles
+* TASK [cleanup]: make header files follow the same format (include order, external APIs prefixed but not internal APIs)
+
+* TASK : Implement enough functionality to display the Tetris intro screen.
+	- At this point we shouldn't need joypad input, interrupt handling, etc, but I suspect 		something is going wrong since I am currently executing as far as reading joypad input but I haven't yet loaded the Tetris intro screen.
+
+* TASK 2 : Implement enough functionality to read joypad input
+	- Implement overwriting hardcoded boot rom with initial cartridge instructions after having executed the hardcoded boot rom.
+	- Implement interrupt handling for joypad input.
 
 https://github.com/osnr/tetris/blob/master/tetris.asm
 
