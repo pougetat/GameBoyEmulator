@@ -221,6 +221,16 @@ void or_a(uint8_t reg, Cpu * cpu_ptr)
     SET_C_FLAG(cpu_ptr, 0);
 }
 
+// and value with register A
+void and_a(uint8_t reg, Cpu * cpu_ptr)
+{
+    cpu_ptr->regA &= reg;
+    SET_Z_FLAG(cpu_ptr, (cpu_ptr->regA == 0));
+    SET_N_FLAG(cpu_ptr, 0);
+    SET_H_FLAG(cpu_ptr, 1);
+    SET_C_FLAG(cpu_ptr, 0);
+}
+
 // compare register A with value
 void cp_a(uint8_t value, Cpu * cpu_ptr)
 {
@@ -304,6 +314,14 @@ void pop_rr(uint8_t * reg_high, uint8_t * reg_low, struct Cpu * cpu_ptr, uint8_t
     *reg_high = mmu_fetch_16bit_val(memory_map, cpu_ptr->regSP) >> 8;
     *reg_low = mmu_fetch_16bit_val(memory_map, cpu_ptr->regSP) & 0xFF;
     cpu_ptr->regSP++;
+}
+
+// complement register A (flip all bits)
+void cpl(Cpu * cpu_ptr)
+{
+    cpu_ptr->regA = ~cpu_ptr->regA;
+    SET_N_FLAG(cpu_ptr, 1);
+    SET_H_FLAG(cpu_ptr, 1);
 }
 
 // Disable interrupts (after the instruction executed after di)
@@ -447,6 +465,9 @@ void cpu_step(GameBoy * gameboy_ptr)
         case 0x2D:
             dec_r(&(cpu_ptr->regL), cpu_ptr);
             break;
+        case 0x2F:
+            cpl(cpu_ptr);
+            break;
         case 0x2E:
             ld_r_n(&(cpu_ptr->regL), cpu_ptr, memory_map);                        
             cpu_ptr->regPC++;
@@ -504,6 +525,12 @@ void cpu_step(GameBoy * gameboy_ptr)
             break;
         case 0x90 ... 0x95:
             sub_a(*get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
+            break;
+        case 0xA0 ... 0xA5:
+            and_a(*get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
+            break;
+        case 0xA6:
+            and_a(REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL), cpu_ptr);
             break;
         case 0xA8 ... 0xAD: 
             xor_a(*get_reg_by_num(cpu_ptr, opcode & 0b111), cpu_ptr);
@@ -563,6 +590,10 @@ void cpu_step(GameBoy * gameboy_ptr)
         case 0xE2:
             ld_addr_r(0xFF00 + (uint16_t) cpu_ptr->regC, cpu_ptr->regA, memory_map);
             break;
+        case 0xE6:
+            and_a(memory_map[cpu_ptr->regPC], cpu_ptr);
+            cpu_ptr->regPC++;
+            break;
         case 0xEA:
             ld_addr_r(mmu_fetch_16bit_val(memory_map, cpu_ptr->regPC), cpu_ptr->regA, memory_map);
             cpu_ptr->regPC++;
@@ -593,6 +624,8 @@ void cpu_step(GameBoy * gameboy_ptr)
                 case 0x10 ... 0x15:
                     rl_r(get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
                     break;
+                case 0x37:
+                    break;
                 case 0x40 ... 0x45:
                     bit(0, *get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
                     break;
@@ -612,20 +645,19 @@ void cpu_step(GameBoy * gameboy_ptr)
                     bit(5, *get_reg_by_num(cpu_ptr, opcode & 0b111), cpu_ptr);
                     break;
                 case 0x70 ... 0x75:
-                    bit(6, *get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
+                     bit(6, *get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
                     break;
                 case 0x78 ... 0x7D:
                     bit(7, *get_reg_by_num(cpu_ptr, opcode & 0b111), cpu_ptr);
                     break;
                 default:
-                    printf("Register not found : %i \n", 0/0);
                     break;
             }
             break;
 
         default:
             debug_cpu(memory_map, cpu_ptr);
-            printf("Instruction not implemented \n");
+            printf("Instruction not implemented : 0x%x \n", opcode);
             printf("%i \n", 0/0);
             break;
     }
