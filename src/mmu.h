@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#define MAX_ROM_SIZE 32768 // (only handling 32 KB roms for now)
+#define MEMORY_MAP_SIZE 65536 // 0x0000 - 0xFFFF
+
 typedef struct GameBoy GameBoy;
 typedef uint16_t memory_addr;
 
@@ -25,11 +28,11 @@ typedef struct Mmu {
 #define R_BOOT_ROM_CONTROL 0xFF50 // Boot rom control
 
 Mmu * mmu_init();
-void mmu_read_rom(struct Mmu * mmu, FILE * rom_file, memory_addr start_address);
-void mmu_step(GameBoy * gameboy_ptr);
+void mmu_read_rom(uint8_t * memory_map, FILE * rom_file, memory_addr start, memory_addr end);
 
-uint16_t mmu_fetch_16bit_val(uint8_t * memory_map, memory_addr address);
-int8_t mmu_fetch_signed_8bit_val(uint8_t * memory_map, memory_addr address);
-void mmu_store_16bit_val(uint8_t * memory_map, memory_addr address, uint16_t value);
+uint16_t mmu_fetch_16bit_val(uint8_t * memory_map, memory_addr addr);
+int8_t mmu_fetch_signed_8bit_val(uint8_t * memory_map, memory_addr addr);
+void mmu_store_16bit_val(uint8_t * memory_map, memory_addr addr, uint16_t value);
+void mmu_store_8bit_val(uint8_t * memory_map, memory_addr addr, uint8_t value);
 
 #endif

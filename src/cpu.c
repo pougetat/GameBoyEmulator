@@ -136,7 +136,7 @@ void ld_sp_nn(Cpu * cpu_ptr, uint8_t * memory_map)
 // (address) <- register
 void ld_addr_r(memory_addr address, uint8_t reg, uint8_t * memory_map)
 {
-    memory_map[address] = reg;
+    mmu_store_8bit_val(memory_map, address, reg);
 }
 
 // register <- (address)
