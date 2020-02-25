@@ -4,9 +4,9 @@
 #include "cpu.h"
 #include "mmu.h"
 
-struct Cpu * cpu_init()
+Cpu * cpu_init()
 {
-    struct Cpu * cpu_ptr = malloc(sizeof(struct Cpu));
+    Cpu * cpu_ptr = malloc(sizeof(Cpu));
 
     cpu_ptr->regB = 0;
     cpu_ptr->regC = 0;
@@ -43,7 +43,7 @@ bool will_carry_7_to_8(uint8_t value1, uint8_t value2)
 void nop(){}
 
 // increment register
-void inc_r(uint8_t * reg_ptr, struct Cpu * cpu_ptr)
+void inc_r(uint8_t * reg_ptr, Cpu * cpu_ptr)
 {
     SET_H_FLAG(cpu_ptr, WILL_CARRY_3_TO_4(*reg_ptr));
     (*reg_ptr)++;
@@ -66,7 +66,7 @@ void inc_rr(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr)
 }
 
 // decrement register
-void dec_r(uint8_t * reg_ptr, struct Cpu * cpu_ptr)
+void dec_r(uint8_t * reg_ptr, Cpu * cpu_ptr)
 {
     SET_H_FLAG(cpu_ptr, !WILL_BORROW_FROM_4(*reg_ptr));
     (*reg_ptr)--;
@@ -109,7 +109,7 @@ void sub_a(uint8_t reg, Cpu * cpu_ptr)
 }
 
 // register_dest <- immediate n
-void ld_r_n(uint8_t * reg_ptr, struct Cpu * cpu_ptr, uint8_t * memory_map)
+void ld_r_n(uint8_t * reg_ptr, Cpu * cpu_ptr, uint8_t * memory_map)
 {
     *reg_ptr = memory_map[cpu_ptr->regPC];
 }
@@ -121,14 +121,14 @@ void ld_r_r(uint8_t * reg_dest_ptr, uint8_t reg_src)
 }
 
 // register pair <- immediate nn
-void ld_rr_nn(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr, struct Cpu * cpu_ptr, uint8_t * memory_map)
+void ld_rr_nn(uint8_t * reg_high_ptr, uint8_t * reg_low_ptr, Cpu * cpu_ptr, uint8_t * memory_map)
 {
     *reg_high_ptr = mmu_fetch_16bit_val(memory_map, cpu_ptr->regPC) >> 8; \
     *reg_low_ptr = mmu_fetch_16bit_val(memory_map, cpu_ptr->regPC) & 0xFF;
 }
 
 // regSP <- immediate nn
-void ld_sp_nn(struct Cpu * cpu_ptr, uint8_t * memory_map)
+void ld_sp_nn(Cpu * cpu_ptr, uint8_t * memory_map)
 {
     cpu_ptr->regSP = mmu_fetch_16bit_val(memory_map, cpu_ptr->regPC);
 }
@@ -172,7 +172,7 @@ bool test_bit_is_0(uint8_t reg_ptr, uint8_t bit_num)
 }
 
 // jump if Z flag not set
-void jr_nz_sn(struct Cpu * cpu_ptr, uint8_t * memory_map)
+void jr_nz_sn(Cpu * cpu_ptr, uint8_t * memory_map)
 {
     if (test_bit_is_0(cpu_ptr->FLAG, 7))
     {
@@ -181,7 +181,7 @@ void jr_nz_sn(struct Cpu * cpu_ptr, uint8_t * memory_map)
 }
 
 // jump if Z flag set
-void jr_z_sn(struct Cpu * cpu_ptr, uint8_t * memory_map)
+void jr_z_sn(Cpu * cpu_ptr, uint8_t * memory_map)
 {
     if (!test_bit_is_0(cpu_ptr->FLAG, 7))
     {
@@ -241,7 +241,7 @@ void cp_a(uint8_t value, Cpu * cpu_ptr)
 }
 
 // rotate register left through carry
-void rl_r(uint8_t * reg_ptr, struct Cpu * cpu_ptr)
+void rl_r(uint8_t * reg_ptr, Cpu * cpu_ptr)
 {
     uint8_t left_most_bit = (*reg_ptr) >> 7;
     *reg_ptr = ((*reg_ptr) << 1) | read_c_flag(cpu_ptr);
@@ -279,14 +279,14 @@ void rla(Cpu * cpu_ptr)
 // Z <- TEST_BIT_IS_0(bit_num, register)
 // N <- reset
 // H <- set
-void bit(uint8_t bit_num, uint8_t reg, struct Cpu * cpu_ptr)
+void bit(uint8_t bit_num, uint8_t reg, Cpu * cpu_ptr)
 {
     SET_Z_FLAG(cpu_ptr, test_bit_is_0(reg, bit_num));
     SET_N_FLAG(cpu_ptr, 0);
     SET_H_FLAG(cpu_ptr, 1);
 }
 
-void call_nn(struct Cpu * cpu_ptr, uint8_t * memory_map)
+void call_nn(Cpu * cpu_ptr, uint8_t * memory_map)
 {
     cpu_ptr->regSP--;
     mmu_store_16bit_val(memory_map, cpu_ptr->regSP, cpu_ptr->regPC+2);
@@ -294,21 +294,29 @@ void call_nn(struct Cpu * cpu_ptr, uint8_t * memory_map)
     cpu_ptr->regPC = mmu_fetch_16bit_val(memory_map, cpu_ptr->regPC);
 }
 
-void ret(struct Cpu * cpu_ptr, uint8_t * memory_map)
+void ret(Cpu * cpu_ptr, uint8_t * memory_map)
 {
     cpu_ptr->regSP++;
     cpu_ptr->regPC = mmu_fetch_16bit_val(memory_map, cpu_ptr->regSP);
     cpu_ptr->regSP++;
 }
 
-void push_rr(uint8_t reg_high, uint8_t reg_low, struct Cpu * cpu_ptr, uint8_t * memory_map)
+void rst(Cpu * cpu_ptr, uint8_t * memory_map, uint8_t value)
+{
+    cpu_ptr->regSP--;
+    mmu_store_16bit_val(memory_map, cpu_ptr->regSP, cpu_ptr->regPC);
+    cpu_ptr->regSP--;
+    cpu_ptr->regPC += value;
+}
+
+void push_rr(uint8_t reg_high, uint8_t reg_low, Cpu * cpu_ptr, uint8_t * memory_map)
 {
     cpu_ptr->regSP--;
     mmu_store_16bit_val(memory_map, cpu_ptr->regSP, REG_PAIR_VAL(reg_high, reg_low));
     cpu_ptr->regSP--;
 }
 
-void pop_rr(uint8_t * reg_high, uint8_t * reg_low, struct Cpu * cpu_ptr, uint8_t * memory_map)
+void pop_rr(uint8_t * reg_high, uint8_t * reg_low, Cpu * cpu_ptr, uint8_t * memory_map)
 {
     cpu_ptr->regSP++;
     *reg_high = mmu_fetch_16bit_val(memory_map, cpu_ptr->regSP) >> 8;
@@ -322,6 +330,18 @@ void cpl(Cpu * cpu_ptr)
     cpu_ptr->regA = ~cpu_ptr->regA;
     SET_N_FLAG(cpu_ptr, 1);
     SET_H_FLAG(cpu_ptr, 1);
+}
+
+// swap high bits with low bits
+void swap(uint8_t * reg_ptr, Cpu * cpu_ptr)
+{
+    uint8_t low_bits = (*reg_ptr) & 0b1111;
+    uint8_t high_bits = (*reg_ptr) >> 4;
+    *reg_ptr = low_bits << 4 | high_bits;
+    SET_Z_FLAG(cpu_ptr, (*reg_ptr == 0));
+    SET_N_FLAG(cpu_ptr, 0);
+    SET_H_FLAG(cpu_ptr, 0);
+    SET_C_FLAG(cpu_ptr, 0);
 }
 
 // Disable interrupts (after the instruction executed after di)
@@ -339,6 +359,9 @@ void cpu_step(GameBoy * gameboy_ptr)
 {
     Cpu * cpu_ptr = gameboy_ptr->cpu_ptr;
     uint8_t * memory_map = gameboy_ptr->mmu_ptr->memory_map;
+
+    //printf("Current address is : 0x%x \n", cpu_ptr->regPC);
+
     uint8_t opcode = memory_map[cpu_ptr->regPC++];
 
     switch (opcode)
@@ -391,6 +414,9 @@ void cpu_step(GameBoy * gameboy_ptr)
         case 0x11:
             ld_rr_nn(&(cpu_ptr->regD), &(cpu_ptr->regE), cpu_ptr, memory_map);
             cpu_ptr->regPC = cpu_ptr->regPC + 2;
+            break;
+        case 0x12:
+            ld_addr_r(REG_PAIR_VAL(cpu_ptr->regD, cpu_ptr->regE), cpu_ptr->regA, memory_map);
             break;
         case 0x13:
             inc_rr(&(cpu_ptr->regD), &(cpu_ptr->regE));
@@ -496,14 +522,23 @@ void cpu_step(GameBoy * gameboy_ptr)
             ld_r_n(&(cpu_ptr->regA), cpu_ptr, memory_map);                        
             cpu_ptr->regPC++;
             break;
+        case 0x47:
+            ld_r_r(&(cpu_ptr->regB), cpu_ptr->regA);
+            break;
         case 0x4F:
             ld_r_r(&(cpu_ptr->regC), cpu_ptr->regA);
             break;
         case 0x57:
             ld_r_r(&(cpu_ptr->regD), cpu_ptr->regA);
             break;
+        case 0x5F:
+            ld_r_r(&(cpu_ptr->regE), cpu_ptr->regA);
+            break;
         case 0x67:
             ld_r_r(&(cpu_ptr->regH), cpu_ptr->regA);
+            break;
+        case 0x6F:
+            ld_r_r(&(cpu_ptr->regL), cpu_ptr->regA);
             break;
         case 0x70 ... 0x75:
             ld_addr_r(REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL), *get_reg_by_num(cpu_ptr, opcode & 0xF), memory_map);
@@ -513,6 +548,9 @@ void cpu_step(GameBoy * gameboy_ptr)
             break;
         case 0x78 ... 0x7D:
             ld_r_r(&(cpu_ptr->regA), *get_reg_by_num(cpu_ptr, opcode & 0b111));
+            break;
+        case 0x7F:
+            ld_r_r(&(cpu_ptr->regA), cpu_ptr->regA);
             break;
         case 0x80 ... 0x85:
             add_a(*get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
@@ -624,7 +662,11 @@ void cpu_step(GameBoy * gameboy_ptr)
                 case 0x10 ... 0x15:
                     rl_r(get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
                     break;
+                case 0x30 ... 0x35:
+                    swap(get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
+                    break;
                 case 0x37:
+                    swap(&cpu_ptr->regA, cpu_ptr);
                     break;
                 case 0x40 ... 0x45:
                     bit(0, *get_reg_by_num(cpu_ptr, opcode & 0xF), cpu_ptr);
@@ -663,10 +705,9 @@ void cpu_step(GameBoy * gameboy_ptr)
     }
 
     cpu_ptr->prev_instruction_cycles = 4; // this will be changed
-    //debug_cpu(memory_map, cpu_ptr);
 }
 
-uint8_t * get_reg_by_num(struct Cpu * cpu_ptr, uint8_t reg_num)
+uint8_t * get_reg_by_num(Cpu * cpu_ptr, uint8_t reg_num)
 {
     if (reg_num == 0)
     {
@@ -698,7 +739,7 @@ uint8_t * get_reg_by_num(struct Cpu * cpu_ptr, uint8_t reg_num)
     }
 }
 
-void debug_cpu(uint8_t * memory_map, struct Cpu * cpu_ptr)
+void debug_cpu(uint8_t * memory_map, Cpu * cpu_ptr)
 {
     printf("CPU state : \n \n");
     // register values

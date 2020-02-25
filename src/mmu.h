@@ -22,6 +22,7 @@ typedef struct Mmu {
 #define R_LY_ADDR 0xFF44   // LCDC Y-Coordinate (R)
 #define R_LYC_ADDR 0xFF45  // LY Compare (R/W)
 #define R_BGP_ADDR 0xFF47  // BG Palette Data (W)
+#define R_BOOT_ROM_CONTROL 0xFF50 // Boot rom control
 
 Mmu * mmu_init();
 void mmu_read_rom(struct Mmu * mmu, FILE * rom_file, memory_addr start_address);
