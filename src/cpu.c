@@ -306,7 +306,7 @@ void rst(Cpu * cpu_ptr, uint8_t * memory_map, uint8_t value)
     cpu_ptr->regSP--;
     mmu_store_16bit_val(memory_map, cpu_ptr->regSP, cpu_ptr->regPC);
     cpu_ptr->regSP--;
-    cpu_ptr->regPC += value;
+    cpu_ptr->regPC = value;
 }
 
 void push_rr(uint8_t reg_high, uint8_t reg_low, Cpu * cpu_ptr, uint8_t * memory_map)
@@ -615,11 +615,23 @@ void cpu_step(GameBoy * gameboy_ptr)
         case 0xC5:
             push_rr(cpu_ptr->regB, cpu_ptr->regC, cpu_ptr, memory_map);
             break;
+        case 0xC7:
+            rst(cpu_ptr, memory_map, 0x00);
+            break;
         case 0xC9:
             ret(cpu_ptr, memory_map);
             break;
         case 0xCD:
             call_nn(cpu_ptr, memory_map);
+            break;
+        case 0xCF:
+            rst(cpu_ptr, memory_map, 0x08);
+            break;
+        case 0xD7:
+            rst(cpu_ptr, memory_map, 0x10);
+            break;
+        case 0xDF:
+            rst(cpu_ptr, memory_map, 0x18);
             break;
         case 0xE0:
             ld_addr_r(0xFF00 + (uint16_t) memory_map[cpu_ptr->regPC], cpu_ptr->regA, memory_map);
@@ -632,10 +644,16 @@ void cpu_step(GameBoy * gameboy_ptr)
             and_a(memory_map[cpu_ptr->regPC], cpu_ptr);
             cpu_ptr->regPC++;
             break;
+        case 0xE7:
+            rst(cpu_ptr, memory_map, 0x20);
+            break;
         case 0xEA:
             ld_addr_r(mmu_fetch_16bit_val(memory_map, cpu_ptr->regPC), cpu_ptr->regA, memory_map);
             cpu_ptr->regPC++;
             cpu_ptr->regPC++;
+            break;
+        case 0xEF:
+            rst(cpu_ptr, memory_map, 0x28);
             break;
         case 0xF0:
             ld_r_addr(&(cpu_ptr->regA), 0xFF00 + (uint16_t) memory_map[cpu_ptr->regPC], memory_map);
@@ -647,12 +665,18 @@ void cpu_step(GameBoy * gameboy_ptr)
         case 0xF3:
             di();
             break;
+        case 0xF7:
+            rst(cpu_ptr, memory_map, 0x30);
+            break;
         case 0xFB:
             ei();
             break;
         case 0xFE:
             cp_a(memory_map[cpu_ptr->regPC], cpu_ptr);
             cpu_ptr->regPC++;
+            break;
+        case 0xFF:
+            rst(cpu_ptr, memory_map, 0x38);
             break;
         case 0xCB:
             opcode = memory_map[cpu_ptr->regPC++];
