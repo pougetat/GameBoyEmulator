@@ -627,6 +627,9 @@ void cpu_step(GameBoy * gameboy_ptr)
         case 0xCF:
             rst(cpu_ptr, memory_map, 0x08);
             break;
+        case 0xD1:
+            pop_rr(&(cpu_ptr->regD), &(cpu_ptr->regE), cpu_ptr, memory_map);
+            break;
         case 0xD7:
             rst(cpu_ptr, memory_map, 0x10);
             break;
@@ -636,6 +639,9 @@ void cpu_step(GameBoy * gameboy_ptr)
         case 0xE0:
             ld_addr_r(0xFF00 + (uint16_t) memory_map[cpu_ptr->regPC], cpu_ptr->regA, memory_map);
             cpu_ptr->regPC++;
+            break;
+        case 0xE1:
+            pop_rr(&(cpu_ptr->regH), &(cpu_ptr->regL), cpu_ptr, memory_map);
             break;
         case 0xE2:
             ld_addr_r(0xFF00 + (uint16_t) cpu_ptr->regC, cpu_ptr->regA, memory_map);
