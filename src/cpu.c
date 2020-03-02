@@ -101,14 +101,15 @@ void add_a(uint8_t value, Cpu * cpu_ptr)
 // add register pair to HLs
 void add_hl_rr(uint8_t reg_high, uint8_t reg_low, Cpu * cpu_ptr)
 {
-    uint8_t carry_low_to_high = will_carry_7_to_8(cpu_ptr->regL, reg_low);
-    cpu_ptr->regL += reg_low;
+    uint32_t hl = (uint32_t) REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL);
+    uint32_t regs = (uint32_t) REG_PAIR_VAL(reg_high, reg_low);
 
-    // TO DO : clean this up
-    SET_H_FLAG(cpu_ptr, (cpu_ptr->regH & 0b1111) + (reg_high & 0b1111) + carry_low_to_high >= 0b10000);
-    SET_C_FLAG(cpu_ptr, (uint16_t)cpu_ptr->regH + (uint16_t)reg_high + carry_low_to_high > 0b100000000);
-    cpu_ptr->regH += reg_high;
+    SET_C_FLAG(cpu_ptr, hl + regs > 0x10000);
+    SET_H_FLAG(cpu_ptr, hl & 0x800 + regs & 0x800 > 0x1000)
     SET_N_FLAG(cpu_ptr, 0);
+    hl += regs;
+    cpu_ptr->regH = (hl & 0xFF00) >> 8;
+    cpu_ptr->regL = hl & 0xFF;
 }
 
 // subtract reg from register A
@@ -373,7 +374,9 @@ void cpu_step(GameBoy * gameboy_ptr)
     Cpu * cpu_ptr = gameboy_ptr->cpu_ptr;
     uint8_t * memory_map = gameboy_ptr->mmu_ptr->memory_map;
 
-    printf("Current address is : 0x%x \n", cpu_ptr->regPC);
+    //printf("Current address is : 0x%x \n", cpu_ptr->regPC);
+    //printf("SP = 0x%x | [SP+2,SP+1] = 0x%x \n", cpu_ptr->regSP, REG_PAIR_VAL(memory_map[cpu_ptr->regSP+2], memory_map[cpu_ptr->regSP+1]));
+    //printf("Current HL value is : 0x%x \n", REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL));
 
     uint8_t opcode = memory_map[cpu_ptr->regPC++];
 
