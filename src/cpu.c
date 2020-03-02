@@ -373,7 +373,7 @@ void cpu_step(GameBoy * gameboy_ptr)
     Cpu * cpu_ptr = gameboy_ptr->cpu_ptr;
     uint8_t * memory_map = gameboy_ptr->mmu_ptr->memory_map;
 
-    //printf("Current address is : 0x%x \n", cpu_ptr->regPC);
+    printf("Current address is : 0x%x \n", cpu_ptr->regPC);
 
     uint8_t opcode = memory_map[cpu_ptr->regPC++];
 
@@ -556,7 +556,7 @@ void cpu_step(GameBoy * gameboy_ptr)
             ld_r_r(&(cpu_ptr->regD), cpu_ptr->regA);
             break;
         case 0x5E:
-            ld_r_addr(cpu_ptr->regE, REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL), memory_map);
+            ld_r_addr(&(cpu_ptr->regE), REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL), memory_map);
             break;
         case 0x5F:
             ld_r_r(&(cpu_ptr->regE), cpu_ptr->regA);
