@@ -98,6 +98,19 @@ void add_a(uint8_t value, Cpu * cpu_ptr)
     SET_N_FLAG(cpu_ptr, 0);
 }
 
+// add register pair to HLs
+void add_hl_rr(uint8_t reg_high, uint8_t reg_low, Cpu * cpu_ptr)
+{
+    uint8_t carry_low_to_high = will_carry_7_to_8(cpu_ptr->regL, reg_low);
+    cpu_ptr->regL += reg_low;
+
+    // TO DO : clean this up
+    SET_H_FLAG(cpu_ptr, (cpu_ptr->regH & 0b1111) + (reg_high & 0b1111) + carry_low_to_high >= 0b10000);
+    SET_C_FLAG(cpu_ptr, (uint16_t)cpu_ptr->regH + (uint16_t)reg_high + carry_low_to_high > 0b100000000);
+    cpu_ptr->regH += reg_high;
+    SET_N_FLAG(cpu_ptr, 0);
+}
+
 // subtract reg from register A
 void sub_a(uint8_t reg, Cpu * cpu_ptr)
 {
@@ -397,6 +410,8 @@ void cpu_step(GameBoy * gameboy_ptr)
             cpu_ptr->regPC++;
             cpu_ptr->regPC++;
             break;
+        case 0x09:
+            add_hl_rr(cpu_ptr->regB, cpu_ptr->regC, cpu_ptr);
             break;
         case 0x0B:
             dec_rr(&(cpu_ptr->regB), &(cpu_ptr->regC));
@@ -437,6 +452,9 @@ void cpu_step(GameBoy * gameboy_ptr)
         case 0x18:
             jr_sn(cpu_ptr, memory_map);
             cpu_ptr->regPC++;
+            break;
+        case 0x19:
+            add_hl_rr(cpu_ptr->regD, cpu_ptr->regE, cpu_ptr);
             break;
         case 0x1A:
             ld_r_addr(&(cpu_ptr->regA), REG_PAIR_VAL(cpu_ptr->regD, cpu_ptr->regE), memory_map);
@@ -482,6 +500,9 @@ void cpu_step(GameBoy * gameboy_ptr)
             jr_z_sn(cpu_ptr, memory_map);
             cpu_ptr->regPC++;
             break;
+        case 0x29:
+            add_hl_rr(cpu_ptr->regH, cpu_ptr->regL, cpu_ptr);
+            break;
         case 0x2A:
             ldi_r_addr(&(cpu_ptr->regA), &(cpu_ptr->regH), &(cpu_ptr->regL), memory_map);
             break;
@@ -508,6 +529,9 @@ void cpu_step(GameBoy * gameboy_ptr)
         case 0x36:
             ld_addr_r(REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL), memory_map[cpu_ptr->regPC], memory_map);
             cpu_ptr->regPC++;
+            break;
+        case 0x39:
+            add_hl_rr(cpu_ptr->regSP >> 8, cpu_ptr->regSP & 0b11111111, cpu_ptr);
             break;
         case 0x3B:
             cpu_ptr->regSP--;
