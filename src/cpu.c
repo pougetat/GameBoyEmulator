@@ -555,6 +555,9 @@ void cpu_step(GameBoy * gameboy_ptr)
         case 0x57:
             ld_r_r(&(cpu_ptr->regD), cpu_ptr->regA);
             break;
+        case 0x5E:
+            ld_r_addr(cpu_ptr->regE, REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL), memory_map);
+            break;
         case 0x5F:
             ld_r_r(&(cpu_ptr->regE), cpu_ptr->regA);
             break;
