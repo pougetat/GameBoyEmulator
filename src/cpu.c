@@ -185,6 +185,11 @@ bool test_bit_is_0(uint8_t reg_ptr, uint8_t bit_num)
     return ((reg_ptr >> bit_num) ^ 0x1);
 }
 
+void j_hl(Cpu * cpu_ptr, uint8_t * memory_map)
+{
+    cpu_ptr->regPC = memory_map[REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL)];
+}
+
 // jump if Z flag not set
 void jr_nz_sn(Cpu * cpu_ptr, uint8_t * memory_map)
 {
@@ -691,6 +696,9 @@ void cpu_step(GameBoy * gameboy_ptr)
             break;
         case 0xE7:
             rst(cpu_ptr, memory_map, 0x20);
+            break;
+        case 0xE9:
+            j_hl(cpu_ptr, memory_map);
             break;
         case 0xEA:
             ld_addr_r(mmu_fetch_16bit_val(memory_map, cpu_ptr->regPC), cpu_ptr->regA, memory_map);
