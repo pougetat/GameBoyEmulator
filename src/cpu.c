@@ -373,9 +373,7 @@ void cpu_step(GameBoy * gameboy_ptr)
     Cpu * cpu_ptr = gameboy_ptr->cpu_ptr;
     uint8_t * memory_map = gameboy_ptr->mmu_ptr->memory_map;
 
-    //printf("Current address is : 0x%x \n", cpu_ptr->regPC);
-    //printf("SP = 0x%x | [SP+2,SP+1] = 0x%x \n", cpu_ptr->regSP, REG_PAIR_VAL(memory_map[cpu_ptr->regSP+2], memory_map[cpu_ptr->regSP+1]));
-    //printf("Current HL value is : 0x%x \n", REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL));
+    //printf("current address : 0x%x \n", cpu_ptr->regPC);
 
     uint8_t opcode = memory_map[cpu_ptr->regPC++];
 
@@ -531,6 +529,9 @@ void cpu_step(GameBoy * gameboy_ptr)
         case 0x32:
             ldd_addr_r(&(cpu_ptr->regH), &(cpu_ptr->regL), cpu_ptr->regA, memory_map);
             break;
+        case 0x35:
+            dec_r(&(memory_map[REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL)]), cpu_ptr);
+            break;
         case 0x36:
             ld_addr_r(REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL), memory_map[cpu_ptr->regPC], memory_map);
             cpu_ptr->regPC++;
@@ -607,6 +608,9 @@ void cpu_step(GameBoy * gameboy_ptr)
             break;
         case 0xA6:
             and_a(REG_PAIR_VAL(cpu_ptr->regH, cpu_ptr->regL), cpu_ptr);
+            break;
+        case 0xA7:
+            and_a(cpu_ptr->regA, cpu_ptr);
             break;
         case 0xA8 ... 0xAD: 
             xor_a(*get_reg_by_num(cpu_ptr, opcode & 0b111), cpu_ptr);
